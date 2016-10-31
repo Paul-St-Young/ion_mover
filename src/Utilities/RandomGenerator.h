@@ -34,6 +34,9 @@
 #include <ctime>
 
 #include <stdint.h>
+#include "Utilities/FakeRandom.h"
+
+typedef FakeRandom RandomGenerator_t;
 
 inline uint32_t make_seed(int i, int n)
 {

@@ -1,21 +1,21 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 1998-2002 by Jeongnim Kim
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-//   Jeongnim Kim
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//   Department of Physics, Ohio State University
-//   Ohio Supercomputer Center
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// File developed by: Miguel Morales, moralessilva2@llnl.gov, Lawrence Livermore National Laboratory
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//                    Mark Dewing, markdewing@gmail.com, University of Illinois at Urbana-Champaign
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 /**@file ParticleAttribOps.h
  *@brief Declaraton of ParticleAttrib<T>
  */
@@ -28,7 +28,7 @@
  *
  *  Equivalent to blitz::Array<T,1>, pooma::Array<1,T>.
  *
- *  class C is a container class. Default is vector<T>
+ *  class C is a container class. Default is std::vector<T>
  *
  *  \todo Implement openMP compatible container class or evaluate function.
  *  \todo Implement get/put member functions for MPI-like parallelism
@@ -48,9 +48,24 @@ struct OTCDot
   inline static Type_t
   apply(const TinyVector<std::complex<T1>,D>& lhs, const TinyVector<std::complex<T2>,D>& rhs)
   {
-    Type_t res = lhs[0].real()*rhs[0].real()+lhs[0].imag()*rhs[0].imag();
+    Type_t res = lhs[0].real()*rhs[0].real()-lhs[0].imag()*rhs[0].imag();
     for (unsigned d=1; d<D; ++d)
       res += lhs[d].real()*rhs[d].real()-lhs[d].imag()*rhs[d].imag();
+    return res;
+  }
+};
+
+// Use complex conjugate of the second argument
+template<class T1, class T2, unsigned D>
+struct OTCDot_CC
+{
+  typedef typename BinaryReturn<T1,T2,OpMultiply>::Type_t Type_t;
+  inline static Type_t
+  apply(const TinyVector<std::complex<T1>,D>& lhs, const TinyVector<std::complex<T2>,D>& rhs)
+  {
+    Type_t res = lhs[0].real()*rhs[0].real()+lhs[0].imag()*rhs[0].imag();
+    for (unsigned d=1; d<D; ++d)
+      res += lhs[d].real()*rhs[d].real()+lhs[d].imag()*rhs[d].imag();
     return res;
   }
 };
@@ -92,21 +107,50 @@ struct OTCDot<T1,T2,3>
   }
 };
 
+// Use complex conjugate of the second argument
+template<class T1, class T2>
+struct OTCDot_CC<T1,T2,3>
+{
+  typedef typename BinaryReturn<T1,T2,OpMultiply>::Type_t Type_t;
+  inline static Type_t
+  apply(const TinyVector<std::complex<T1>,3>& lhs, const
+        TinyVector<std::complex<T2>,3>& rhs)
+  {
+    return lhs[0].real()*rhs[0].real()+lhs[0].imag()*rhs[0].imag()
+           + lhs[1].real()*rhs[1].real()+lhs[1].imag()*rhs[1].imag()
+           + lhs[2].real()*rhs[2].real()+lhs[2].imag()*rhs[2].imag();
+  }
+};
+
+template<typename T, unsigned D>
+inline T Dot(const ParticleAttrib<TinyVector<std::complex<T>, D> >& pa,
+                  const ParticleAttrib<TinyVector<std::complex<T>, D> >& pb)
+{
+  T sum = 0;
+  for(int i=0; i<pa.size(); i++)
+  {
+    sum += OTCDot<T,T,D>::apply(pa[i],pb[i]);
+  }
+  return sum;
+}
+
+// Use complex conjugate of the second argument
 template<unsigned D>
-inline double Dot(const ParticleAttrib<TinyVector<std::complex<double>, D> >& pa,
+inline double Dot_CC(const ParticleAttrib<TinyVector<std::complex<double>, D> >& pa,
                   const ParticleAttrib<TinyVector<std::complex<double>, D> >& pb)
 {
   double sum = 0;
   for(int i=0; i<pa.size(); i++)
   {
-    sum += OTCDot<double,double,D>::apply(pa[i],pb[i]);
+    sum += OTCDot_CC<double,double,D>::apply(pa[i],pb[i]);
   }
   return sum;
 }
 
-inline double Sum(const ParticleAttrib<std::complex<double> >& pa)
+template<typename T>
+inline T Sum(const ParticleAttrib<std::complex<T> >& pa)
 {
-  double sum = 0;
+  T sum = 0;
   for(int i=0; i<pa.size(); i++)
   {
     sum += pa[i].real();
@@ -136,17 +180,18 @@ inline void Copy(const ParticleAttrib<TinyVector<T,D> >& c,
 
 /** generic PAOps
  */
-template<class T, unsigned D> struct PAOps { };
+template<class T, unsigned D, class T1=T> struct PAOps { };
 
 ///specialization for three-dimension
-template<class T>
-struct PAOps<T,3>
+template<class T, class T1>
+struct PAOps<T,3,T1>
 {
 
   typedef T                        real_type;
-  typedef complex<T>               complex_type;
+  typedef std::complex<T>               complex_type;
   typedef TinyVector<T,3>          rpos_type;
-  typedef TinyVector<complex<T>,3> cpos_type;
+  typedef TinyVector<T1,3>         ipos_type;
+  typedef TinyVector<std::complex<T1>,3> cpos_type;
 
   static inline
   void scale(T a, const ParticleAttrib<cpos_type>& pa,
@@ -161,7 +206,7 @@ struct PAOps<T,3>
   }
 
   static inline
-  void scale(T a, const ParticleAttrib<rpos_type>& pa,
+  void scale(T a, const ParticleAttrib<ipos_type>& pa,
              ParticleAttrib<rpos_type>& pb)
   {
     pb=a*pa;
@@ -179,7 +224,7 @@ struct PAOps<T,3>
   }
 
   static inline
-  void axpy(T a, const ParticleAttrib<rpos_type>& pa, ParticleAttrib<rpos_type>& pb)
+  void axpy(T a, const ParticleAttrib<ipos_type>& pa, ParticleAttrib<rpos_type>& pb)
   {
     for(int i=0; i<pa.size(); ++i)
     {
@@ -190,7 +235,7 @@ struct PAOps<T,3>
   }
 
   static inline
-  void axpy(T a, const ParticleAttrib<cpos_type>& pa, const ParticleAttrib<rpos_type>& pb,
+  void axpy(T a, const ParticleAttrib<cpos_type>& pa, const ParticleAttrib<ipos_type>& pb,
             ParticleAttrib<rpos_type>& py)
   {
     for(int i=0; i<pa.size(); ++i)
@@ -202,7 +247,7 @@ struct PAOps<T,3>
   }
 
   static inline
-  void axpy(T a, const ParticleAttrib<rpos_type>& pa, const ParticleAttrib<rpos_type>& pb,
+  void axpy(T a, const ParticleAttrib<ipos_type>& pa, const ParticleAttrib<ipos_type>& pb,
             ParticleAttrib<rpos_type>& py)
   {
     for(int i=0; i<pa.size(); ++i)
@@ -214,7 +259,7 @@ struct PAOps<T,3>
   }
 
   static inline
-  void copy(const ParticleAttrib<rpos_type>& px, ParticleAttrib<rpos_type>& py)
+  void copy(const ParticleAttrib<ipos_type>& px, ParticleAttrib<rpos_type>& py)
   {
     py=px;
   }
@@ -232,14 +277,15 @@ struct PAOps<T,3>
 };
 
 ///specialization for 2-dimension
-template<class T>
-struct PAOps<T,2>
+template<class T, class T1>
+struct PAOps<T,2,T1>
 {
 
   typedef T                        real_type;
-  typedef complex<T>               complex_type;
+  typedef std::complex<T>               complex_type;
   typedef TinyVector<T,2>          rpos_type;
-  typedef TinyVector<complex<T>,2> cpos_type;
+  typedef TinyVector<T1,2>         ipos_type;
+  typedef TinyVector<std::complex<T1>,2> cpos_type;
 
   static inline
   void scale(T a, const ParticleAttrib<cpos_type>& pa,
@@ -253,7 +299,7 @@ struct PAOps<T,2>
   }
 
   static inline
-  void scale(T a, const ParticleAttrib<rpos_type>& pa,
+  void scale(T a, const ParticleAttrib<ipos_type>& pa,
              ParticleAttrib<rpos_type>& pb)
   {
     pb=a*pa;
@@ -271,7 +317,7 @@ struct PAOps<T,2>
   }
 
   static inline
-  void axpy(T a, const ParticleAttrib<rpos_type>& pa, ParticleAttrib<rpos_type>& pb)
+  void axpy(T a, const ParticleAttrib<ipos_type>& pa, ParticleAttrib<rpos_type>& pb)
   {
     for(int i=0; i<pa.size(); i++)
     {
@@ -281,7 +327,7 @@ struct PAOps<T,2>
   }
 
   static inline
-  void axpy(T a, const ParticleAttrib<cpos_type>& pa, const ParticleAttrib<rpos_type>& pb,
+  void axpy(T a, const ParticleAttrib<cpos_type>& pa, const ParticleAttrib<ipos_type>& pb,
             ParticleAttrib<rpos_type>& py)
   {
     for(int i=0; i<pa.size(); i++)
@@ -292,7 +338,7 @@ struct PAOps<T,2>
   }
 
   static inline
-  void axpy(T a, const ParticleAttrib<rpos_type>& pa, const ParticleAttrib<rpos_type>& pb,
+  void axpy(T a, const ParticleAttrib<ipos_type>& pa, const ParticleAttrib<ipos_type>& pb,
             ParticleAttrib<rpos_type>& py)
   {
     for(int i=0; i<pa.size(); i++)
@@ -307,7 +353,7 @@ struct PAOps<T,2>
 
 
 /***************************************************************************
- * $RCSfile$   $Author: jnkim $
- * $Revision: 5857 $   $Date: 2013-05-20 02:43:03 -0700 (Mon, 20 May 2013) $
- * $Id: ParticleAttribOps.h 5857 2013-05-20 09:43:03Z jnkim $
+ * $RCSfile$   $Author: yeluo $
+ * $Revision: 7167 $   $Date: 2016-10-07 17:46:07 -0500 (Fri, 07 Oct 2016) $
+ * $Id: ParticleAttribOps.h 7167 2016-10-07 22:46:07Z yeluo $
  ***************************************************************************/
