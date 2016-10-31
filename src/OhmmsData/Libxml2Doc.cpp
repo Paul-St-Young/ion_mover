@@ -1,19 +1,22 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2005-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Raymond Clay III, j.k.rofling@gmail.com, Lawrence Livermore National Laboratory
+//                    Jaron T. Krogel, krogeljt@ornl.gov, Oak Ridge National Laboratory
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//                    Mark Dewing, markdewing@gmail.com, University of Illinois at Urbana-Champaign
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 #include "Configuration.h"
 #include "OhmmsData/Libxml2Doc.h"
 #include "Message/Communicate.h"
@@ -171,7 +174,7 @@ bool Libxml2Document::parse(const std::string& xmlfile)
   //}
   m_doc = xmlParseMemory(buffer,length);
   delete [] buffer;
-  qmcplusplus::app_log() << " Parsing " << xmlfile << " : " << aClock.elapsed() << " seconds " << endl;
+  qmcplusplus::app_log() << " Parsing " << xmlfile << " : " << aClock.elapsed() << " seconds " << std::endl;
   if (m_doc == NULL)
   {
     return false;
@@ -206,6 +209,30 @@ bool Libxml2Document::parse(const std::string& xmlfile)
     return false;
   }
   InFileRoot = std::string(xmlfile,0,xmlfile.size()-4);
+  return true;
+}
+
+bool Libxml2Document::parseFromString(const std::string& data)
+{
+  if(m_doc != NULL)
+    xmlFreeDoc(m_doc);
+
+  // read xml document w/o memory limits
+  // note that XML_PARSE_HUGE is part of an enum in libxml2
+  // it is only available in libxml 2.7+
+  m_doc = xmlReadMemory(data.c_str(),data.length(),NULL,NULL,XML_PARSE_HUGE);
+  //m_doc = xmlParseFile(xmlfile.c_str());
+
+  if (m_doc == NULL)
+  {
+    return false;
+  }
+  m_root = xmlDocGetRootElement(m_doc);
+  if (m_root == NULL)
+  {
+    return false;
+  }
+  InFileRoot = std::string("string");
   return true;
 }
 #endif
@@ -244,7 +271,7 @@ bool Libxml2Document::parse(const std::string& xmlfile)
 //    }
 //#else
 /***************************************************************************
- * $RCSfile$   $Author: jtkrogel $
- * $Revision: 6423 $   $Date: 2015-01-21 11:55:45 -0800 (Wed, 21 Jan 2015) $
- * $Id: Libxml2Doc.cpp 6423 2015-01-21 19:55:45Z jtkrogel $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: Libxml2Doc.cpp 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

@@ -1,3 +1,24 @@
+#//////////////////////////////////////////////////////////////////////////////////////
+#// This file is distributed under the University of Illinois/NCSA Open Source License.
+#// See LICENSE file in top directory for details.
+#//
+#// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+#//
+#// File developed by: Jordan E. Vincent, University of Illinois at Urbana-Champaign
+#//                    Miguel Morales, moralessilva2@llnl.gov, Lawrence Livermore National Laboratory
+#//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Luke Shulenburger, lshulen@sandia.gov, Sandia National Laboratories
+#//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Anouar Benali, benali@anl.gov, Argonne National Laboratory
+#//                    Ye Luo, yeluo@anl.gov, Argonne National Laboratory
+#//
+#// File created by: Jordan E. Vincent, University of Illinois at Urbana-Champaign
+#//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 PROJECT(qmctools)
 
 SET(QMCTOOLS
@@ -19,6 +40,9 @@ SET(MOSRCS
   CasinoParser.cpp
   BParser.cpp
   BMakeFunc.cpp
+  GamesFMOParser.cpp
+  VSVBParser.cpp
+  QPParser.cpp
 )
 
 # create libmocommon 
@@ -35,8 +59,6 @@ FOREACH(p ${QTOOLS})
   FOREACH(l ${QMC_UTIL_LIBS})
     TARGET_LINK_LIBRARIES(${p} ${l})
   ENDFOREACH(l ${QMC_UTIL_LIBS})
-
-  TARGET_LINK_LIBRARIES(${p} ${LAPACK_LIBRARY} ${BLAS_LIBRARY} ${FORTRAN_LIBRARIES})
 
   if(ENABLE_TAU_PROFILE)
     TARGET_LINK_LIBRARIES(${p} tau)

@@ -1,6 +1,22 @@
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
+//
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include "Utilities/RandomGenerator.h"
 #include <vector>
-using namespace std;
 #include "QMCTools/HDFWalkerMerger.h"
 #include "Utilities/OhmmsInfo.h"
 
@@ -16,10 +32,10 @@ int main(int argc, char **argv)
   }
   int ic=0;
   int np=1;
-  string ofile(argv[1]);
+  std::string ofile(argv[1]);
   while(ic<argc)
   {
-    string w(argv[ic]);
+    std::string w(argv[ic]);
     if(w.find("-n")<w.size())
     {
       np=atoi(argv[++ic]);
@@ -31,7 +47,7 @@ int main(int argc, char **argv)
       }
     ++ic;
   }
-  cout << "Number of processors = " << np << endl;
+  std::cout << "Number of processors = " << np << std::endl;
   //qmcplusplus::HDFWalkerMerger merger(argv[1],atoi(argv[2]));
   //qmcplusplus::HDFWalkerMerger merger(argv[1],np);
   //merger.merge();

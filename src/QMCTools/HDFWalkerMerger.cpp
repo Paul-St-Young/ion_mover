@@ -1,28 +1,28 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2004- by Jeongnim Kim and Jordan Vincent
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   Jeongnim Kim
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include <vector>
 #include <iostream>
-using namespace std;
 #include "QMCTools/HDFWalkerMerger.h"
 #include "Utilities/RandomGeneratorIO.h"
 using namespace qmcplusplus;
 
 
-HDFWalkerMerger::HDFWalkerMerger(const string& aroot, int ncopy)
+HDFWalkerMerger::HDFWalkerMerger(const std::string& aroot, int ncopy)
   : NumCopy(ncopy), FileRoot(aroot)
 {
 }
@@ -34,14 +34,14 @@ void HDFWalkerMerger::init()
   char fname[128];
   char GrpName[128];
   hsize_t dimin[3], summary_size=3;
-  vector<double> summaryIn;
+  std::vector<double> summaryIn;
   //determine the minimum configuration and walkers for each config
   int min_config=10000;
   MaxNumWalkers=0;
   for(int ip=0; ip<NumCopy; ip++)
   {
     int nconf=1;
-    numWalkersIn.push_back(new vector<hsize_t>);
+    numWalkersIn.push_back(new std::vector<hsize_t>);
     sprintf(fname,"%s.p%03d.config.h5",FileRoot.c_str(),ip);
     hid_t hfile = H5Fopen(fname,H5F_ACC_RDWR,H5P_DEFAULT);
     hid_t h_config = H5Gopen(hfile,"config_collection");
@@ -156,7 +156,7 @@ void HDFWalkerMerger::merge()
     sprintf(fname,"%s.p%03d.config.h5",FileRoot.c_str(),ip);
     hid_t h0 = H5Fopen(fname,H5F_ACC_RDWR,H5P_DEFAULT);
     hid_t cfcollect = H5Gopen(h0,"config_collection");
-    const vector<hsize_t>& nw(*(numWalkersIn[ip]));
+    const std::vector<hsize_t>& nw(*(numWalkersIn[ip]));
     for(int iconf=0; iconf<NumConfig; iconf++)
     {
       //get the number of walkers for (ip,iconf)
@@ -207,7 +207,7 @@ void HDFWalkerMerger::merge()
   H5Fclose(masterfile);
 }
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: HDFWalkerMerger.cpp 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: HDFWalkerMerger.cpp 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

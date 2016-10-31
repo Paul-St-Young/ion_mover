@@ -1,22 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
-/** @file OhmmsParameter.h
- * @brief Declaration of OhmmsParameter class.
- */
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jaron T. Krogel, krogeljt@ornl.gov, Oak Ridge National Laboratory
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 #ifndef OHMMS_OHMMSPARAMETER_H
 #define OHMMS_OHMMSPARAMETER_H
 
@@ -39,7 +37,7 @@
  <li> <b>value</b> is the content of the parameter of type T.
  </ul>
  <ul> Two kinds of template parameter T are valid:
- <li> intrinsic C/C++ variables, such as int,double
+ <li> intrinsic C/C variables, such as int,double
  <li> Ohmms basic data types in OhmmsPETE, such as  TinyVector&lt;T,D&gt; and  Tensor&lt;T,D&gt;
  </ul>
  Using other types are valid, as far as the operators << and >> can handle the xmlChar*.
@@ -72,7 +70,7 @@ public:
     tolower(unit_);
   }
 
-  ///print to an ostream
+  ///print to an std::ostream
   inline bool get(std::ostream& os) const
   {
     os << "<parameter name=\""<< myName << "\" condition=\""
@@ -92,7 +90,7 @@ public:
   }
 
 
-  ///read from istream
+  ///read from std::istream
   inline bool put(std::istream& is)
   {
     is >> ref_;
@@ -159,7 +157,7 @@ public:
     tolower(unit_);
   }
 
-  ///print to an ostream
+  ///print to an std::ostream
   inline bool get(std::ostream& os) const
   {
     os << "<parameter name=\""<< myName << "\">" << ref_ << "</parameter>" << std::endl;
@@ -179,7 +177,9 @@ public:
     if(ac)
     {
       std::istringstream stream(ac);
-      return stream >> ref_;
+      //return stream >> ref_;
+      stream >> ref_;
+      return stream.good();
     }
     else
     {
@@ -193,7 +193,7 @@ public:
     ref_=x;
   }
 
-  ///read from istream
+  ///read from std::istream
   inline bool put(std::istream& is)
   {
     std::string yes;
@@ -232,7 +232,7 @@ public:
 };
 #endif /*OHMMS_OHMMSPARAMETER_H*/
 /***************************************************************************
- * $RCSfile$   $Author: jnkim $
- * $Revision: 6060 $   $Date: 2013-11-12 07:20:31 -0800 (Tue, 12 Nov 2013) $
- * $Id: OhmmsParameter.h 6060 2013-11-12 15:20:31Z jnkim $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: OhmmsParameter.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

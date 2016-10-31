@@ -1,18 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include "Message/Communicate.h"
 #include "Utilities/OhmmsInfo.h"
 #include "QMCWaveFunctions/MolecularOrbitals/GTO2GridBuilder.h"
@@ -58,19 +60,19 @@ void buildBasisSet(xmlNodePtr cur)
 {
   xmlNodePtr anchor = cur;
   xmlNodePtr grid_ptr = 0;
-  vector<xmlNodePtr> phi_ptr;
-  vector<QuantumNumberType> nlms;
+  std::vector<xmlNodePtr> phi_ptr;
+  std::vector<QuantumNumberType> nlms;
   int Lmax = 0;
   int current = 0;
   std::string acenter("none");
   const xmlChar* aptr = xmlGetProp(cur,(const xmlChar*)"species");
   if(aptr)
     acenter = (const char*)aptr;
-  cout << "Building basis set for " << acenter << endl;
+  std::cout << "Building basis set for " << acenter << std::endl;
   cur = anchor->children;
   while(cur != NULL)
   {
-    string cname((const char*)(cur->name));
+    std::string cname((const char*)(cur->name));
     if(cname == "grid")
       grid_ptr = cur;
     else
@@ -107,7 +109,7 @@ void buildBasisSet(xmlNodePtr cur)
   rbuilder->print(acenter,1);
 }
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: gto2grid.cpp 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: gto2grid.cpp 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

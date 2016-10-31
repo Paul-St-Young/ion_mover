@@ -1,3 +1,21 @@
+#//////////////////////////////////////////////////////////////////////////////////////
+#// This file is distributed under the University of Illinois/NCSA Open Source License.
+#// See LICENSE file in top directory for details.
+#//
+#// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+#//
+#// File developed by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+#//                    Raymond Clay III, j.k.rofling@gmail.com, Lawrence Livermore National Laboratory
+#//                    Paul R. C. Kent, kentpr@ornl.gov, Oak Ridge National Laboratory
+#//                    Ye Luo, yeluo@anl.gov, Argonne National Laboratory
+#//                    Mark Dewing, markdewing@gmail.com, University of Illinois at Urbana-Champaign
+#//
+#// File created by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+#//////////////////////////////////////////////////////////////////////////////////////
+    
+    
 PROJECT(qmcapp)
 
 ####################################
@@ -17,20 +35,25 @@ ADD_LIBRARY(qmc ${QMCAPPDIR})
 
 ####################################
 # list of QMC applications
-# qmcapp is the only one
 ####################################
-SET(QMCSRCS qmcapp)
+SET(QMCSRCS qmcpack)
 
 FOREACH(p ${QMCSRCS})
 
-  ADD_EXECUTABLE(${p} ${p}.cpp)
+# QMCPACK historically called qmcapp, and still built from qmcapp.cpp
+# Override source name for executable in this case, otherwise
+# executablename.cpp used for main()
+ IF ( ${p} STREQUAL "qmcpack" )
+  ADD_EXECUTABLE(${p} qmcapp.cpp) 
+ELSE()
+  ADD_EXECUTABLE(${p} ${p}.cpp) 
+ENDIF()
+
   TARGET_LINK_LIBRARIES(${p} qmc qmcdriver qmcham qmcwfs interface qmcbase qmcutil adios_config)
 
   FOREACH(l ${QMC_UTIL_LIBS})
     TARGET_LINK_LIBRARIES(${p} ${l})
   ENDFOREACH(l ${QMC_UTIL_LIBS})
-
-  TARGET_LINK_LIBRARIES(${p} ${LAPACK_LIBRARY} ${BLAS_LIBRARY} ${FORTRAN_LIBRARIES})
 
   if(ENABLE_TAU_PROFILE)
     TARGET_LINK_LIBRARIES(${p} tau)
@@ -41,8 +64,4 @@ FOREACH(p ${QMCSRCS})
   ENDIF(MPI_LIBRARY)
 
 ENDFOREACH(p ${QMCSRCS})
-
-####################################
-# Add test subdirectory
-####################################
 

@@ -1,19 +1,19 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2004-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: D. Das, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 #ifndef OHMMS_OHMMSPARAMETERSET_H
 #define OHMMS_OHMMSPARAMETERSET_H
 
@@ -158,7 +158,7 @@ struct ParameterSet: public OhmmsElementBase
 };
 #endif /*OHMMS_OHMMSPARAMETERSET_H*/
 /***************************************************************************
- * $RCSfile$   $Author: jnkim $
- * $Revision: 6060 $   $Date: 2013-11-12 07:20:31 -0800 (Tue, 12 Nov 2013) $
- * $Id: ParameterSet.h 6060 2013-11-12 15:20:31Z jnkim $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: ParameterSet.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

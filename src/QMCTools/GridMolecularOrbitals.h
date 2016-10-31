@@ -1,19 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #ifndef QMCPLUSPLUS_CONVERT2_RADIALGRID_H
 #define QMCPLUSPLUS_CONVERT2_RADIALGRID_H
 
@@ -81,15 +82,15 @@ private:
   ///Current RadiaaGridFunctorBuilder
   RGFBuilderBase* rbuilder;
   ///map for the radial orbitals
-  map<string,int>    RnlID;
+  std::map<std::string,int>    RnlID;
   ///map for the centers
-  map<string,int>    CenterID;
+  std::map<std::string,int>    CenterID;
 
   ///map for (n,l,m,s) to its quantum number index
-  map<string,int> nlms_id;
+  std::map<std::string,int> nlms_id;
 
   ///append Ylm channels
-  int expandYlm(const string& rnl, const QuantumNumberType& nlms, int num,
+  int expandYlm(const std::string& rnl, const QuantumNumberType& nlms, int num,
                 CenteredOrbitalType* aos, xmlNodePtr cur1,
                 int expandlm=DONOT_EXPAND);
 
@@ -97,7 +98,7 @@ private:
 }
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: GridMolecularOrbitals.h 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: GridMolecularOrbitals.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

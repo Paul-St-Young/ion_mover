@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
+//
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jordan E. Vincent, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Miguel Morales, moralessilva2@llnl.gov, Lawrence Livermore National Laboratory
+//                    Anouar Benali, benali@anl.gov, Argonne National Laboratory
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jordan E. Vincent, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #ifndef QMCPLUSPLUS_TOOLS_EXTERNAL_GAUSSIANPARSERBASE_H
 #define QMCPLUSPLUS_TOOLS_EXTERNAL_GAUSSIANPARSERBASE_H
 #include <iostream>
@@ -37,6 +57,20 @@ struct QMCGaussianParserBase
   int SizeOfBasisSet;
 // mmorales: number of Molecular orbitals, not always equal to SizeOfBasisSet
   int numMO, readNO, readGuess, numMO2print;
+// benali: Point Charge from FMO ESP 
+  int *  ESPIonChargeIndex;
+  int * ESPValenceChargeIndex;
+  int * ESPAtomicNumberIndex;
+  int TotNumMonomer;
+  ParticleSet *ESPSystem;
+  std::vector <std::vector<double> > ESP;
+  std::vector<std::vector<std::string> > ESPGroupName;
+  xmlNodePtr createESPSet(int iesp);
+  static std::map<int,std::string> ESPName;
+  int FMOIndexI,FMOIndexJ,FMOIndexK;
+  bool FMO, FMO1,FMO2,FMO3,DoCusp,FixValence,QP;
+  
+
   std::string Title;
   std::string basisType;
   std::string basisName;
@@ -47,7 +81,9 @@ struct QMCGaussianParserBase
 
   ParticleSet IonSystem;
 
-  std::vector<string> GroupName;
+
+  std::vector<std::string> GroupName;
+
   std::vector<int> gShell, gNumber, gBound;
   std::vector<int> Occ_alpha, Occ_beta;
   std::vector<value_type> Qv;
@@ -59,14 +95,16 @@ struct QMCGaussianParserBase
   xmlNodePtr gridPtr;
   std::vector<std::string> CIalpha,CIbeta;
   std::vector<std::string> CSFocc;
-  std::vector<vector<std::string> > CSFalpha,CSFbeta;
-  std::vector<vector<double> > CSFexpansion;
+  std::vector<std::vector<std::string> > CSFalpha,CSFbeta;
+  std::vector<std::vector<double> > CSFexpansion;
   std::vector<double> CIcoeff;
   std::vector<int> CIexcitLVL;
   int ci_size,ci_nca,ci_ncb,ci_nea,ci_neb,ci_nstates;
   double ci_threshold;
   bool usingCSF;
-  std::vector<pair<int,double> > coeff2csf;
+  bool VSVB;
+
+  std::vector<std::pair<int,double> > coeff2csf;
 
   QMCGaussianParserBase();
   QMCGaussianParserBase(int argc, char** argv);
@@ -83,22 +121,29 @@ struct QMCGaussianParserBase
   void createShell(int n, int ig, int off_, xmlNodePtr abasis);
   xmlNodePtr createDeterminantSet();
   xmlNodePtr createMultiDeterminantSet();
+  xmlNodePtr createMultiDeterminantSetVSVB();
+  xmlNodePtr createMultiDeterminantSetQP();
   xmlNodePtr createDeterminantSetWithHDF5();
   xmlNodePtr createJ3();
   xmlNodePtr createJ2();
   xmlNodePtr createJ1();
 
 
-  int numberOfExcitationsCSF(string&);
+  int numberOfExcitationsCSF( std::string&);
 
   void map2GridFunctors(xmlNodePtr cur);
   virtual void parse(const std::string& fname) = 0;
 
-  virtual void dump(const string& psi_tag,
-                    const string& ion_tag);
+  virtual void dump(const std::string& psi_tag,
+                    const std::string& ion_tag);
+
+  virtual void Fmodump(const std::string& psi_tag,
+                                 const std::string& ion_tag,
+                                 std::string Mytag);
 
   //static std::vector<std::string> IonName;
   static std::map<int,std::string> IonName;
+
   static std::vector<std::string> gShellType;
   static std::vector<int>         gShellID;
 

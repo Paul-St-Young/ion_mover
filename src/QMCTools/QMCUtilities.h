@@ -1,22 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003- by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   Jeongnim Kim
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//   Department of Physics, Ohio State University
-//   Ohio Supercomputer Center
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #ifndef QMCPLUSPLUS_SIMPLE_UTILITIES_H
 #define QMCPLUSPLUS_SIMPLE_UTILITIES_H
 
@@ -34,8 +32,8 @@ determineNumOfElectrons(ParticleSet& el, xmlXPathContextPtr acontext)
 {
   //initialize el with the wave function information
   //This is to determine the number of up and down electrons
-  vector<int> N;
-  string sdname("//");
+  std::vector<int> N;
+  std::string sdname("//");
   sdname.append(OrbitalBuilderBase::sd_tag);
   xmlXPathObjectPtr result
   = xmlXPathEvalExpression((const xmlChar*)(sdname.c_str()),acontext);
@@ -44,11 +42,11 @@ determineNumOfElectrons(ParticleSet& el, xmlXPathContextPtr acontext)
   XMLReport("Found " << nsd << " SlaterDeterminant.")
   if(nsd)
   {
-    vector<xmlNodePtr> dset;
+    std::vector<xmlNodePtr> dset;
     xmlNodePtr cur=result->nodesetval->nodeTab[0]->children;
     while(cur != NULL)
     {
-      string cname((const char*)(cur->name));
+      std::string cname((const char*)(cur->name));
       if(cname == OrbitalBuilderBase::det_tag)
         dset.push_back(cur);
       cur=cur->next;
@@ -70,7 +68,7 @@ determineNumOfElectrons(ParticleSet& el, xmlXPathContextPtr acontext)
           cur = dset[i]->children;
           while(cur != NULL)
           {
-            string cname((const char*)(cur->name));
+            std::string cname((const char*)(cur->name));
             if(cname == OrbitalBuilderBase::spo_tag)
               norb++;
             cur=cur->next;
@@ -100,7 +98,7 @@ determineNumOfElectrons(ParticleSet& el, xmlXPathContextPtr acontext)
           found_el=true;
           while(cur != NULL)
           {
-            string cname((const char*)(cur->name));
+            std::string cname((const char*)(cur->name));
             if(cname == "group")
             {
               xmlChar* g= xmlGetProp(cur,(const xmlChar*)"size");
@@ -136,9 +134,9 @@ determineNumOfElectrons(ParticleSet& el, xmlXPathContextPtr acontext)
 
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: QMCUtilities.h 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: QMCUtilities.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/
 
 

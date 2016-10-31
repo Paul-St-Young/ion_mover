@@ -1,22 +1,22 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2004- by Jeongnim Kim and Jordan Vincent
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   Jeongnim Kim
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include <vector>
 #include <iostream>
-using namespace std;
 #include "QMCTools/HDFWalkerMerger.h"
 #include "Utilities/RandomGeneratorIO.h"
 #include "Utilities/UtilityFunctions.h"
@@ -26,7 +26,7 @@ using namespace std;
 using namespace qmcplusplus;
 
 
-HDFWalkerMerger::HDFWalkerMerger(const string& aroot, int ncopy)
+HDFWalkerMerger::HDFWalkerMerger(const std::string& aroot, int ncopy)
   : NumCopy(ncopy), FileRoot(aroot)
 {
 }
@@ -45,14 +45,14 @@ void HDFWalkerMerger::init()
   int nprocs=myComm->ncontexts();
   int mynode=myComm->mycontext();
   hsize_t dimin[3], summary_size=3;
-  vector<int> nw_pernode(nprocs,0);
-  vector<int> nc_offset(nprocs+1,0);
+  std::vector<int> nw_pernode(nprocs,0);
+  std::vector<int> nc_offset(nprocs+1,0);
   FairDivideLow(NumCopy,nprocs,nc_offset);
-  cout << "Number of copies " << NumCopy << endl;
-  cout << "Number of proces " << nprocs << endl;
+  std::cout << "Number of copies " << NumCopy << std::endl;
+  std::cout << "Number of proces " << nprocs << std::endl;
   for(int i=0; i<=nprocs; i++)
-    cout << nc_offset[i] << endl;
-  numWalkersIn.push_back(new vector<hsize_t>);
+    std::cout << nc_offset[i] << std::endl;
+  numWalkersIn.push_back(new std::vector<hsize_t>);
   //determine the minimum configuration and walkers for each config
   int min_config=1;
   for(int ip=nc_offset[mynode]; ip<nc_offset[mynode+1]; ip++)
@@ -91,7 +91,7 @@ void HDFWalkerMerger::init()
     OffSet(0,ip+1)=OffSet(0,ip)+nw_pernode[ip];
     if(mynode ==0)
     {
-      cout << ip << " has " << nw_pernode[ip] << endl;
+      std::cout << ip << " has " << nw_pernode[ip] << std::endl;
     }
   }
   for(int ip=0; ip<=nprocs; ip++)
@@ -155,14 +155,14 @@ void HDFWalkerMerger::merge()
     //get the number of walkers for (ip,iconf)
     dimin[0] = (*numWalkersIn[0])[ipL];
     sprintf(ConfName,"config%04d",0);
-    cout << "Node " << mynode << " reads " << dimin[0] << " walkers from " << fname <<  endl;
+    std::cout << "Node " << mynode << " reads " << dimin[0] << " walkers from " << fname <<  std::endl;
     int nd=dimin[0]*NumPtcl*Dimension;
     hid_t cf_id = H5Gopen(cfcollect,ConfName);
     Container_t vecIn(nd);
     HDFAttribIO<Container_t> in(vecIn, 3, dimin);
     in.read(cf_id,"coord");
     H5Gclose(cf_id);
-    std::copy(vecIn.begin(),vecIn.begin()+nd,vecLoc.begin()+ndacc);
+    copy(vecIn.begin(),vecIn.begin()+nd,vecLoc.begin()+ndacc);
     ndacc+=nd;
     H5Fclose(h0);
   }

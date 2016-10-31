@@ -1,3 +1,20 @@
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
+//
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include <vector>
 #include <string>
 #include <iostream>
@@ -39,20 +56,20 @@ int main(int argc, char** argv)
     myTimer.restart();
     MatrixOperators::product(A,y,z.data());
     gemv_t+=myTimer.elapsed();
-    // cout << "<<<<<< GEMM TEST " << endl;
+    // std::cout << "<<<<<< GEMM TEST " << std::endl;
     // for(int i=0; i<N; i++) {
     //   for(int j=0; j<L; j++) {
     //     scalar_t v=0.0;
     //     for(int k=0; k<M; k++) v+=A(i,k)*B(k,j);
-    //     cout << i << "," << j << " " << v-C(i,j) << " " << v << endl;
+    //     std::cout << i << "," << j << " " << v-C(i,j) << " " << v << std::endl;
     //   }
     // }
-    // cout << "<<<<<< GEMV TEST " << endl;
+    // std::cout << "<<<<<< GEMV TEST " << std::endl;
     // for(int i=0; i<N; i++) {
     //   scalar_t v=0.0;
     //   for(int j=0; j<M; j++) v+=A(i,j)*y(j);
-    //   cout << i << " " << v-z[i] << " " << v << endl;
+    //   std::cout << i << " " << v-z[i] << " " << v << std::endl;
     // }
   }
-  cout << "|"<<N << "|"<<M << "|" << L << "|" << gemm_t/niter << "|" << gemv_t/niter<< "|" << endl;
+  std::cout << "|"<<N << "|"<<M << "|" << L << "|" << gemm_t/niter << "|" << gemv_t/niter<< "|" << std::endl;
 }

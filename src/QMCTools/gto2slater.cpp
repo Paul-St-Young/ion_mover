@@ -1,18 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include "Message/Communicate.h"
 #include "Utilities/OhmmsInfo.h"
 #include "Numerics/OneDimGridBase.h"
@@ -30,7 +32,7 @@ struct GTO2Slater
   bool Normalized;
   GridType myGrid;
   xmlNodePtr gridPtr;
-  map<string,xmlNodePtr> sPtr;
+  std::map<std::string,xmlNodePtr> sPtr;
 
   GTO2Slater():Normalized(false),gridPtr(0) {}
   int parse(const char* fname);
@@ -72,7 +74,7 @@ int GTO2Slater::parse(const char* fname)
   {
     for(int ic=0; ic<result->nodesetval->nodeNr; ic++)
     {
-      cout << "Going to optimize" << endl;
+      std::cout << "Going to optimize" << std::endl;
       if(put(result->nodesetval->nodeTab[ic]))
       {
         optimize();
@@ -88,15 +90,15 @@ bool GTO2Slater::put(xmlNodePtr cur)
   cur = cur->children;
   while(cur != NULL)
   {
-    string cname((const char*)(cur->name));
+    std::string cname((const char*)(cur->name));
     if(cname == "grid")
       gridPtr = cur;
     else
       if(cname == "basisGroup")
       {
-        string rid("invalid");
-        string rtype("Gaussian");
-        string norm("no");
+        std::string rid("invalid");
+        std::string rtype("Gaussian");
+        std::string norm("no");
         int l=0;
         OhmmsAttributeSet inAttrib;
         inAttrib.add(rid,"rid");
@@ -112,7 +114,7 @@ bool GTO2Slater::put(xmlNodePtr cur)
             Normalized=true;
           else
             Normalized=false;
-          map<string,xmlNodePtr>::iterator it(sPtr.find(rid));
+          std::map<std::string,xmlNodePtr>::iterator it(sPtr.find(rid));
           if(it == sPtr.end())
           {
             sPtr[rid]=cur;
@@ -135,7 +137,7 @@ void GTO2Slater::optimize()
   double ri = 1e-5;
   double rf = 10.0;
   int npts = 101;
-  string gridType("log");
+  std::string gridType("log");
   if(gridPtr)
   {
     OhmmsAttributeSet radAttrib;
@@ -151,7 +153,7 @@ void GTO2Slater::optimize()
   RadialOrbitalType radorb(&myGrid);
   int L= 0;
   //Loop over all the constracted S orbitals
-  map<string,xmlNodePtr>::iterator it(sPtr.begin()),it_end(sPtr.end());
+  std::map<std::string,xmlNodePtr>::iterator it(sPtr.begin()),it_end(sPtr.end());
   while(it != it_end)
   {
     //create contracted gaussian
@@ -169,7 +171,7 @@ void GTO2Slater::optimize()
   sPtr.clear();
 }
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: gto2slater.cpp 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: gto2slater.cpp 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

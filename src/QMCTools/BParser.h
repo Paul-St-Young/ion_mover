@@ -1,20 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2006- by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   Jeongnim Kim
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 /**@file BParser.h
  * @brief Declaration of BParser
  */
@@ -36,7 +36,7 @@ struct AGPLambda
   int J;
   double X;
   AGPLambda(int i, int j, double x): I(i), J(j), X(x) {}
-  AGPLambda(vector<string>& w)
+  AGPLambda(std::vector<std::string>& w)
   {
     I=atoi(w[0].c_str());
     J=atoi(w[1].c_str());
@@ -61,24 +61,24 @@ public:
 
 
   /** Size of the basis set per atom for the determinant */
-  vector<int> detBasisPerAtom;
+  std::vector<int> detBasisPerAtom;
   /** Size of the basis set per atom for the three-body jastrow */
-  vector<int> j3BasisPerAtom;
+  std::vector<int> j3BasisPerAtom;
   /** Basis set per atom for the determinant*/
-  map<int,vector<BMakeFuncBase*>*> detBasisSet;
+  std::map<int,std::vector<BMakeFuncBase*>*> detBasisSet;
   /** Basis set per atom for the three-body jastrow*/
-  map<int,vector<BMakeFuncBase*>*> j3BasisSet;
+  std::map<int,std::vector<BMakeFuncBase*>*> j3BasisSet;
   /** Occupation mask for the expanded basis set for the determinant */
-  vector<int> detOcc;
+  std::vector<int> detOcc;
   /** Occupation mask for the expanded basis set for the three-body jastrow */
-  vector<int> j3Occ;
+  std::vector<int> j3Occ;
 
   /** non-zero paired Lambda elements for the determinant **/
-  vector<AGPLambda> detPairedLambda;
+  std::vector<AGPLambda> detPairedLambda;
   /** non-zero un-paired Lambda elements for the determinant **/
-  vector<AGPLambda> detUnPairedLambda;
+  std::vector<AGPLambda> detUnPairedLambda;
   /** non-zero Lambda elements for the three-body jastrow **/
-  vector<AGPLambda> j3Lambda;
+  std::vector<AGPLambda> j3Lambda;
 
   ///default constructor
   BParser();
@@ -88,7 +88,7 @@ public:
 
   ///overwrite the virtual function
   void parse(const std::string& fname);
-  void dump(const string& psi_tag, const string& ion_tag);
+  void dump(const std::string& psi_tag, const std::string& ion_tag);
 
   void getGeometry(std::istream& is);
   void getBasisSetForDet(std::istream& is);
@@ -100,13 +100,13 @@ public:
 
   xmlNodePtr createDeterminantSet();
   xmlNodePtr createJ3();
-  xmlNodePtr createBasisSet(map<int,vector<BMakeFuncBase*>*>& bset,
-                            vector<int>& basisPerAtom, vector<int>& occ,
+  xmlNodePtr createBasisSet(std::map<int,std::vector<BMakeFuncBase*>*>& bset,
+                            std::vector<int>& basisPerAtom, std::vector<int>& occ,
                             bool jastrow);
 };
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: BParser.h 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: BParser.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

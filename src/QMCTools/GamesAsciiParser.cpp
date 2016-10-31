@@ -1,3 +1,22 @@
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
+//
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Miguel Morales, moralessilva2@llnl.gov, Lawrence Livermore National Laboratory
+//                    Ye Luo, yeluo@anl.gov, Argonne National Laboratory
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//                    Mark Dewing, markdewing@gmail.com, University of Illinois at Urbana-Champaign
+//
+// File created by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include "QMCTools/GamesAsciiParser.h"
 #include <fstream>
 #include <iterator>
@@ -5,7 +24,6 @@
 #include <set>
 #include <map>
 
-using namespace std;
 
 void Cartesian2Spherical(int n, double* Cart, double* Sphe);
 
@@ -38,6 +56,11 @@ GamesAsciiParser::GamesAsciiParser(int argc, char** argv):
 void GamesAsciiParser::parse(const std::string& fname)
 {
   std::ifstream fin(fname.c_str());
+  if (fin.fail())
+  {
+    std::cerr << "Error when opening file: " << fname << std::endl;
+    abort();
+  }
   pivot_begin= fin.tellg();
   std::string aline;
   // if basis functions are removed, this will be modified below
@@ -47,25 +70,25 @@ void GamesAsciiParser::parse(const std::string& fname)
   search(fin,"SPIN MULTIPLICITY",aline);
   parsewords(aline.c_str(),currentWords);
   SpinMultiplicity = atoi(currentWords[2].c_str());
-  cout<<"SPIN MULTIPLICITY: " <<SpinMultiplicity <<endl;
+  std::cout <<"SPIN MULTIPLICITY: " <<SpinMultiplicity << std::endl;
   search(fin,"TOTAL NUMBER OF ATOMS",aline);
   parsewords(aline.c_str(),currentWords);
   NumberOfAtoms = atoi(currentWords[4].c_str());
-  cout<<"NUMBER OF ATOMS: " <<NumberOfAtoms <<endl;
+  std::cout <<"NUMBER OF ATOMS: " <<NumberOfAtoms << std::endl;
   if(lookFor(fin,"SCFTYP=UHF",aline))
   {
     SpinRestricted=false;
-    cout<<"Spin Unrestricted MOs" <<endl;
+    std::cout <<"Spin Unrestricted MOs" << std::endl;
   }
   else
   {
-    cout<<"Spin Restricted MOs" <<endl;
+    std::cout <<"Spin Restricted MOs" << std::endl;
   }
   if(lookFor(fin,"TOTAL NUMBER OF MOS IN VARIATION SPACE=",aline))
   {
     parsewords(aline.c_str(),currentWords);
     numMO = atoi(currentWords[7].c_str());
-    cout<<"NUMBER OF MOs: " <<numMO <<endl;
+    std::cout <<"NUMBER OF MOs: " <<numMO << std::endl;
   }
   else
   {
@@ -76,14 +99,14 @@ void GamesAsciiParser::parse(const std::string& fname)
     {
       parsewords(aline.c_str(),currentWords);
       numMO = atoi(currentWords[12].c_str());
-      cout<<"NUMBER OF MOs: " <<numMO <<endl;
+      std::cout <<"NUMBER OF MOs: " <<numMO << std::endl;
     }
     else
     {
       fin.close();
       fin.open(fname.c_str());
       pivot_begin= fin.tellg();
-      cout<<"Didn't find reduction of variational space, assuming cartesian number of MO's. \n";
+      std::cout <<"Didn't find reduction of variational space, assuming cartesian number of MO's. \n";
       numMO = SizeOfBasisSet;
       //abort();
     }
@@ -95,35 +118,35 @@ void GamesAsciiParser::parse(const std::string& fname)
   fin.seekg(pivot_begin);
   if(usingECP)
   {
-    cout<<"Using ECP." <<endl;
+    std::cout <<"Using ECP." << std::endl;
     search(fin,"NUMBER OF ELECTRONS KEPT IN THE CALCULATION IS",aline);
     parsewords(aline.c_str(),currentWords);
     NumberOfEls = atoi(currentWords[8].c_str());
-    cout<<"Number of electrons: " <<NumberOfEls <<endl;
-    cout.flush();
+    std::cout <<"Number of electrons: " <<NumberOfEls << std::endl;
+    std::cout.flush();
     search(fin,"NUMBER OF OCCUPIED ORBITALS (ALPHA) KEPT IS",aline);
     parsewords(aline.c_str(),currentWords);
     NumberOfAlpha = atoi(currentWords[7].c_str());
-    cout<<"Number of alpha electrons: " <<NumberOfAlpha <<endl;
+    std::cout <<"Number of alpha electrons: " <<NumberOfAlpha << std::endl;
     search(fin,"NUMBER OF OCCUPIED ORBITALS (BETA ) KEPT IS",aline);
     parsewords(aline.c_str(),currentWords);
     NumberOfBeta = atoi(currentWords[8].c_str());
-    cout<<"Number of beta electrons: " <<NumberOfBeta <<endl;
+    std::cout <<"Number of beta electrons: " <<NumberOfBeta << std::endl;
   }
   else
   {
     search(fin,"NUMBER OF ELECTRONS ",aline);
     parsewords(aline.c_str(),currentWords);
     NumberOfEls = atoi(currentWords[3].c_str());
-    cout<<"Number of electrons: " <<NumberOfEls <<endl;
+    std::cout <<"Number of electrons: " <<NumberOfEls << std::endl;
     search(fin,"NUMBER OF OCCUPIED ORBITALS (ALPHA)",aline);
     parsewords(aline.c_str(),currentWords);
     NumberOfAlpha = atoi(currentWords[5].c_str());
-    cout<<"Number of alpha electrons: " <<NumberOfAlpha <<endl;
+    std::cout <<"Number of alpha electrons: " <<NumberOfAlpha << std::endl;
     search(fin,"NUMBER OF OCCUPIED ORBITALS (BETA )",aline);
     parsewords(aline.c_str(),currentWords);
     NumberOfBeta = atoi(currentWords[6].c_str());
-    cout<<"Number of beta electrons: " <<NumberOfBeta <<endl;
+    std::cout <<"Number of beta electrons: " <<NumberOfBeta << std::endl;
   }
   getGaussianCenters(fin);
   fin.seekg(pivot_begin);
@@ -131,13 +154,13 @@ void GamesAsciiParser::parse(const std::string& fname)
     // look for natural orbitals
   {
 // output from ALDET and GUGA CI
-    cout<<"Reading " <<readNO <<" orbitals from file.\n";
+    std::cout <<"Reading " <<readNO <<" orbitals from file.\n";
     numMO=readNO;
     if(lookFor(fin,"NATURAL ORBITALS IN ATOMIC ORBITAL BASIS"))
     {
       MOtype = "NaturalOrbitals";
       readtype=1;
-      cout<<"Reading Natural Orbitals from ALDET/GUGA/FSOCI run output. \n";
+      std::cout <<"Reading Natural Orbitals from ALDET/GUGA/FSOCI run output. \n";
     }
     else
     {
@@ -148,11 +171,11 @@ void GamesAsciiParser::parse(const std::string& fname)
       {
         MOtype = "NaturalOrbitals";
         readtype=2;
-        cout<<"Reading Natural Orbitals from MCSCF run output. \n";
+        std::cout <<"Reading Natural Orbitals from MCSCF run output. \n";
       }
       else
       {
-        cerr<<"Could not find Natural Orbitals. \n";
+        std::cerr <<"Could not find Natural Orbitals. \n";
         abort();
       }
     }
@@ -160,17 +183,17 @@ void GamesAsciiParser::parse(const std::string& fname)
   else
     if (readGuess > 0)
     {
-      cout<<"Reading " <<readGuess <<" orbitals from file.\n";
+      std::cout <<"Reading " <<readGuess <<" orbitals from file.\n";
       numMO=readGuess;
       if(lookFor(fin,"     INITIAL GUESS ORBITALS"))
       {
         MOtype = "InitialGuess";
         readtype=0;
-        cout<<"Reading INITIAL GUESS ORBITALS output. \n";
+        std::cout <<"Reading INITIAL GUESS ORBITALS output. \n";
       }
       else
       {
-        cerr<<"Could not find INITIAL GUESS ORBITALS. \n";
+        std::cerr <<"Could not find INITIAL GUESS ORBITALS. \n";
         abort();
       }
     }
@@ -182,7 +205,7 @@ void GamesAsciiParser::parse(const std::string& fname)
         MOtype = "Canonical";
         readtype=0;
         numMO=numMO2print;
-        cout<<"Reading RHF Canonical Orbitals from Gamess output. \n";
+        std::cout <<"Reading RHF Canonical Orbitals from Gamess output. \n";
       }
       else
       {
@@ -194,11 +217,11 @@ void GamesAsciiParser::parse(const std::string& fname)
           MOtype = "Canonical";
           readtype=0;
           numMO=numMO2print;
-          cout<<"Reading Optimized Orbitals from MCSCF run output. \n";
+          std::cout <<"Reading Optimized Orbitals from MCSCF run output. \n";
         }
         else
         {
-          cerr<<"Could not find eigenstates. \n";
+          std::cerr <<"Could not find eigenstates. \n";
           abort();
         }
       }
@@ -210,16 +233,21 @@ void GamesAsciiParser::parse(const std::string& fname)
   if(multideterminant)
   {
     fin.open(outputFile.c_str());
+    if (fin.fail())
+    {
+      std::cerr << "Error when opening file: " << outputFile << std::endl;
+      abort();
+    }
     pivot_begin= fin.tellg();
-//cout<<"looking for dets " <<endl;
+//cout<<"looking for dets " << std::endl;
 //cout.flush();
     if(lookFor(fin,"GUGA DISTINCT ROW TABLE"))
     {
-      cout<<"Found GUGA ROW TABLE, reading CSF." <<endl;
+      std::cout <<"Found GUGA ROW TABLE, reading CSF." << std::endl;
 //cout.flush();
       if(!lookFor(fin,"SYMMETRIES FOR THE",aline))
       {
-        cerr<<"Could not find number of frozen core orbitals in output file.\n";
+        std::cerr <<"Could not find number of frozen core orbitals in output file.\n";
         abort();
       }
       else
@@ -228,7 +256,7 @@ void GamesAsciiParser::parse(const std::string& fname)
         NAC = atoi(aline.substr(30,3).c_str());
         NEXT = atoi(aline.substr(42,3).c_str());
         NTOT=NEXT+NAC;
-        cout<<"# core, #active, #external: " <<NFZC <<" " <<NAC <<" " <<NEXT <<endl;
+        std::cout <<"# core, #active, #external: " <<NFZC <<" " <<NAC <<" " <<NEXT << std::endl;
       }
 //cout.flush();
       fin.seekg(pivot_begin);
@@ -236,14 +264,14 @@ void GamesAsciiParser::parse(const std::string& fname)
     }
     else
     {
-      cout<<"Could not find GUGA ROW TABLE, looking for Slater Dets." <<endl;
+      std::cout <<"Could not find GUGA ROW TABLE, looking for Slater Dets." << std::endl;
 //cout.flush();
       fin.close();
       fin.open(outputFile.c_str());
       pivot_begin= fin.tellg();
       if(lookFor(fin,"DIRECT DETERMINANT ORMAS-CI"))
       {
-        cout<<"Found ORMAS-CI" <<endl;
+        std::cout <<"Found ORMAS-CI" << std::endl;
 //cout.flush();
         fin.close();
         fin.open(outputFile.c_str());
@@ -252,7 +280,7 @@ void GamesAsciiParser::parse(const std::string& fname)
       }
       else
       {
-        cout<<"Assuming ALDET-CI" <<endl;
+        std::cout <<"Assuming ALDET-CI" << std::endl;
 //cout.flush();
         fin.close();
         fin.open(outputFile.c_str());
@@ -267,8 +295,8 @@ void GamesAsciiParser::parse(const std::string& fname)
 void GamesAsciiParser::getGeometry(std::istream& is)
 {
   //atomic numbers
-  vector<int> atomic_number,core;
-  vector<double> q,pos;
+  std::vector<int> atomic_number,core;
+  std::vector<double> q,pos;
   int natms=0;
   tags.clear();
   is.seekg(pivot_begin);
@@ -278,7 +306,7 @@ void GamesAsciiParser::getGeometry(std::istream& is)
   {
     if(is.eof())
     {
-      cerr<<"Could not find atomic coordinates. \n";
+      std::cerr <<"Could not find atomic coordinates. \n";
       abort();
     }
     getwords(currentWords,is);
@@ -313,7 +341,7 @@ void GamesAsciiParser::getGeometry(std::istream& is)
   // effective charges are read from ECP section
   if(natms != NumberOfAtoms)
   {
-    cerr<<"Could not find atomic coordinates for all atoms. \n";
+    std::cerr <<"Could not find atomic coordinates for all atoms. \n";
     abort();
   }
 // this is risky but works for now
@@ -323,7 +351,7 @@ void GamesAsciiParser::getGeometry(std::istream& is)
   {
     if(is.eof())
     {
-      cerr<<"Problem looking for ECPs, this should not happen. Contact developers for help. \n";
+      std::cerr <<"Problem looking for ECPs, this should not happen. Contact developers for help. \n";
       abort();
     }
     getwords(currentWords,is);
@@ -346,7 +374,7 @@ void GamesAsciiParser::getGeometry(std::istream& is)
       {
         if(is.eof())
         {
-          cerr<<"Found ECPs, but problem looking ZCORE data.\n";
+          std::cerr <<"Found ECPs, but problem looking ZCORE data.\n";
           abort();
         }
         getwords(currentWords,is);
@@ -371,8 +399,8 @@ void GamesAsciiParser::getGeometry(std::istream& is)
           it0 = find(currentWords.begin(),currentWords.end(),"ATOM");
           if(it0 == currentWords.end())
           {
-            cerr<<"Problem with ECP data. Didn't found ATOM tag\n";
-            cerr<<is <<endl;
+            std::cerr <<"Problem with ECP data. Didn't found ATOM tag\n";
+            std::cerr << is.rdbuf() << std::endl;
             abort();
           }
           it0++;
@@ -382,15 +410,15 @@ void GamesAsciiParser::getGeometry(std::istream& is)
             it++;
             core[nq0] = atoi(it->c_str());
             q[nq0] -= core[nq0];
-            cout<<"Found ECP for atom " <<nq0 <<" with zcore " <<core[nq0] <<endl;
+            std::cout <<"Found ECP for atom " <<nq0 <<" with zcore " <<core[nq0] << std::endl;
           }
           else
           {
             it = find(currentWords.begin(),currentWords.end(),"ATOM");
             if(it == currentWords.end())
             {
-              cerr<<"Problem with ECP data. Didn't found ATOM tag\n";
-              cerr<<"Atom: " <<nq0 <<endl;
+              std::cerr <<"Problem with ECP data. Didn't found ATOM tag\n";
+              std::cerr <<"Atom: " <<nq0 << std::endl;
               abort();
             }
             std::vector<std::string>::iterator it2=it;
@@ -398,21 +426,21 @@ void GamesAsciiParser::getGeometry(std::istream& is)
             int nq = atoi(it2->c_str());
             if(nq != nq0+1)
             {
-              cerr<<"Problem with ECP data. ID's don't agree\n";
-              cerr<<"Atom: " <<nq0 <<endl;
+              std::cerr <<"Problem with ECP data. ID's don't agree\n";
+              std::cerr <<"Atom: " <<nq0 << std::endl;
               abort();
             }
             it = find(it2,currentWords.end(),"ATOM");
             if(it == currentWords.end())
             {
-              cerr<<"Problem with ECP data (2).\n";
-              cerr<<"Atom: " <<nq0 <<endl;
+              std::cerr <<"Problem with ECP data (2).\n";
+              std::cerr <<"Atom: " <<nq0 << std::endl;
               abort();
             }
             nq = atoi((it+1)->c_str());
             core[nq0] = core[nq-1];
             q[nq0] -= core[nq0];
-            cout<<"Found ECP for atom " <<nq0 <<" with zcore " <<core[nq0] <<endl;
+            std::cout <<"Found ECP for atom " <<nq0 <<" with zcore " <<core[nq0] << std::endl;
           }
         }
       }
@@ -428,8 +456,8 @@ void GamesAsciiParser::getGeometry(std::istream& is)
         break;
     }
   }
-  cout<<"usingECP: " <<(usingECP?("yes"):("no")) <<endl;
-  cout.flush();
+  std::cout <<"usingECP: " <<(usingECP?("yes"):("no")) << std::endl;
+  std::cout.flush();
   SpeciesSet& species(IonSystem.getSpeciesSet());
   for(int i=0, ii=0; i<NumberOfAtoms; i++)
   {
@@ -448,7 +476,7 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
 {
   gBound.resize(NumberOfAtoms+1);
   int ng,nx;
-  string aline;
+  std::string aline;
   std::map<std::string,int> basisDataMap;
   int nUniqAt=0;
   for(int i=0; i<NumberOfAtoms; i++)
@@ -460,13 +488,14 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
     }
   }
 
-  vector<vector<double> > expo(nUniqAt),coef(nUniqAt),coef2(nUniqAt);
-  vector<int> nshll(nUniqAt,0); //use this to 
-  vector<vector<int> > ncoeffpershell(nUniqAt);
-  vector<vector<std::string> > shID(nUniqAt);
+  std::vector<std::vector<double> > expo(nUniqAt),coef(nUniqAt),coef2(nUniqAt);
+  std::vector<int> nshll(nUniqAt,0); //use this to 
+  std::vector<std::vector<int> > ncoeffpershell(nUniqAt);
+  std::vector<std::vector<std::string> > shID(nUniqAt);
   std::map<std::string,int> gsMap;
   gsMap[std::string("S")]=1;
   gsMap[std::string("SP")]=2;
+  gsMap[std::string("L")]=2;
   gsMap[std::string("P")]=3;
   gsMap[std::string("D")]=4;
   gsMap[std::string("F")]=5;
@@ -479,7 +508,7 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
   {
     if(is.eof())
     {
-      cerr<<"Problem with basis set data.\n";
+      std::cerr <<"Problem with basis set data.\n";
       abort();
     }
     getwords(currentWords,is);
@@ -513,7 +542,7 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
       std::map<std::string,int>::iterator it(basisDataMap.find(currentWords[0]));
       if(it == basisDataMap.end())
       {
-        cerr<<"Error in parser.\n";
+        std::cerr <<"Error in parser.\n";
         abort();
       }
       currPos=it->second;
@@ -530,7 +559,7 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
 
       while(true)
       {
-        streampos pivot= is.tellg();
+        std::streampos pivot= is.tellg();
         getwords(currentWords,is);
         if(currentWords.empty()) //empty line after the shell
         {
@@ -556,19 +585,24 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
             ncoeffpershell[currPos][nshll[currPos]]++;
             shID[currPos][nshll[currPos]] = currentWords[1];
 
+            if(gsMap.find(currentWords[1]) == gsMap.end())
+            {
+              std::cerr <<"Unhandled primitive type " << currentWords[1] << std::endl;
+              abort();
+            }
             if(gsMap[currentWords[1]] == 2)
             {
-              cerr<<"Can't handle SP basis states yet. Fix later.\n";
+              std::cerr <<"Can't handle SP basis states yet. Fix later.\n";
               abort();
             }
             if(gsMap[currentWords[1]] >= 7)
             {
-              cerr<<"Can't handle H basis states or higher yet. Fix later.\n";
+              std::cerr <<"Can't handle H basis states or higher yet. Fix later.\n";
               abort();
             }
-            cout << currPos << ":" <<expo[currPos].back() << " " << coef[currPos].back() << " " 
+            std::cout << currPos << ":" <<expo[currPos].back() << " " << coef[currPos].back() << " " 
               << ncoeffpershell[currPos][nshll[currPos]] 
-              << " " << shID[currPos][nshll[currPos]] << endl;
+              << " " << shID[currPos][nshll[currPos]] << std::endl;
           }
         }
       }
@@ -583,13 +617,13 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
     int currPos;
     if(currentWords.size() == 0)
     {
-      cerr<<"Error in parser.\n";
+      std::cerr <<"Error in parser.\n";
       abort();
     }
     std::map<std::string,int>::iterator it(basisDataMap.find(currentWords[0]));
     if(it == basisDataMap.end())
     {
-      cerr<<"Error in parser.\n";
+      std::cerr <<"Error in parser.\n";
       abort();
     }
     currPos=it->second;
@@ -617,12 +651,12 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
       shID[currPos][nshll[currPos]] = currentWords[1];
       if(gsMap[currentWords[1]] == 2)
       {
-        cerr<<"Can't handle SP basis states yet. Fix later.\n";
+        std::cerr <<"Can't handle SP basis states yet. Fix later.\n";
         abort();
       }
       if(gsMap[currentWords[1]] >= 7)
       {
-        cerr<<"Can't handle H basis states or higher yet. Fix later.\n";
+        std::cerr <<"Can't handle H basis states or higher yet. Fix later.\n";
         abort();
       }
     }
@@ -632,13 +666,13 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
     int currPos;
     if(currentWords.size() == 0)
     {
-      cerr<<"Error in parser.\n";
+      std::cerr <<"Error in parser.\n";
       abort();
     }
     std::map<std::string,int>::iterator it(basisDataMap.find(currentWords[0]));
     if(it == basisDataMap.end())
     {
-      cerr<<"Error in parser.\n";
+      std::cerr <<"Error in parser.\n";
       abort();
     }
     currPos=it->second;
@@ -670,7 +704,7 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
       shID[currPos][nshll[currPos]] = currentWords[1];
       if(gsMap[currentWords[1]] == 2)
       {
-        cerr<<"Can't handle SP basis states yet. Fix later.\n";
+        std::cerr <<"Can't handle SP basis states yet. Fix later.\n";
         abort();
       }
     }
@@ -687,7 +721,7 @@ void GamesAsciiParser::getGaussianCenters(std::istream& is)
     std::map<std::string,int>::iterator it(basisDataMap.find(tags[i]));
     if(it == basisDataMap.end())
     {
-      cerr<<"Error in parser.\n";
+      std::cerr <<"Error in parser.\n";
       abort();
     }
     gBound[i] = gtot;
@@ -721,9 +755,9 @@ void GamesAsciiParser::getMO(std::istream& is)
   //}
   getwords(currentWords,is);  // ----------------------
   getwords(currentWords,is);  // empty line
-  vector<double> dummy(50);
+  std::vector<double> dummy(50);
   Matrix<double> CartMat(numMO,SizeOfBasisSet);
-  streampos pivot;
+  std::streampos pivot;
   pivot= is.tellg();
   std::vector<std::string> CartLabels(SizeOfBasisSet);
 // this is not the best way, you should use the basis type (e.g. S,P,D,etc) to do this
@@ -744,7 +778,7 @@ void GamesAsciiParser::getMO(std::istream& is)
     {
       CartLabels[k] = currentWords[3];
     }
-//cout<<"label: " <<k <<"  " <<CartLabels[k] <<endl; cout.flush();
+//cout<<"label: " <<k <<"  " <<CartLabels[k] << std::endl; std::cout.flush();
   }
 
   is.seekg(pivot);
@@ -766,7 +800,7 @@ void GamesAsciiParser::getMO(std::istream& is)
   for(int i=0; i<numMO; i++)
     for(int k=0; k<SizeOfBasisSet; k++)
       EigVec[cnt++] = CartMat[i][k];
-  cout<<"Finished reading MO." <<endl;
+  std::cout <<"Finished reading MO." << std::endl;
 }
 
 void GamesAsciiParser::getMO_single_set(std::istream& is, Matrix<double> &CartMat, std::vector<value_type>& EigVal)
@@ -789,7 +823,7 @@ void GamesAsciiParser::getMO_single_set(std::istream& is, Matrix<double> &CartMa
     for(int k=0; k<SizeOfBasisSet; k++)
     {
       getwords(currentWords,is);
-//cout<<"i,k,size: " <<i <<" " <<k <<" " <<currentWords.size() <<" " <<currentWords[4] <<endl;
+//cout<<"i,k,size: " <<i <<" " <<k <<" " <<currentWords.size() <<" " <<currentWords[4] << std::endl;
       if(currentWords.size() == 8)
         // G basis or higher TAG gets mixed with atom id
       {
@@ -810,9 +844,9 @@ void GamesAsciiParser::getMO_single_set(std::istream& is, Matrix<double> &CartMa
     }
     getwords(currentWords,is);
     cnt+=5;
-//cout<<"cnt: " <<cnt <<endl; cout.flush();
+//cout<<"cnt: " <<cnt << std::endl; std::cout.flush();
   }
-//cout<<"done with main block, reading rem: " <<rem <<endl; cout.flush();
+//cout<<"done with main block, reading rem: " <<rem << std::endl; std::cout.flush();
   if(rem > 0)
   {
     getwords(currentWords,is);
@@ -845,7 +879,7 @@ void GamesAsciiParser::getMO_single_set(std::istream& is, Matrix<double> &CartMa
     }
     getwords(currentWords,is);
   }
-//cout<<"done with rem block, writing eigV: " <<endl; cout.flush();
+//cout<<"done with rem block, writing eigV: " << std::endl; std::cout.flush();
 }
 
 void Cartesian2Spherical(int n, double* Cart, double* Sphe)
@@ -950,7 +984,7 @@ void Cartesian2Spherical(int n, double* Cart, double* Sphe)
   */
   default:
   {
-    cerr<<"Error in Cartesian2Spherical. Invalid n: " <<n <<endl;
+    std::cerr <<"Error in Cartesian2Spherical. Invalid n: " <<n << std::endl;
     abort();
   }
   }
@@ -972,7 +1006,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
   {
     if(is.eof())
     {
-      cerr<<"Could not find CSF expansion. \n";
+      std::cerr <<"Could not find CSF expansion. \n";
       abort();
     }
     getwords(currentWords,is);
@@ -994,7 +1028,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
         {
           ci_size++;
           int nq = atoi(currentWords[0].c_str());
-          pair<int,double> cic(nq,cof);
+          std::pair<int,double> cic(nq,cof);
           coeff2csf.push_back(cic);
           if(NTOT < 50)
           {
@@ -1008,7 +1042,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
             }
             else
             {
-              string tmp=currentWords[2];
+              std::string tmp=currentWords[2];
               getwords(currentWords,is);
               tmp+=currentWords[0];
               CSFocc.push_back(tmp);
@@ -1029,9 +1063,9 @@ void GamesAsciiParser::getCSF(std::istream& is)
     }
   }
   while(notfound);
-  cout<<"Done reading csf coefficients." <<endl;
-  cout<<"Found: " <<coeff2csf.size() <<" CSFs.\n";
-  cout.flush();
+  std::cout <<"Done reading csf coefficients." << std::endl;
+  std::cout <<"Found: " <<coeff2csf.size() <<" CSFs.\n";
+  std::cout.flush();
 // look for highest occupied MO to avoid using unnecesary ones
   ci_nstates = 0;
   for(int i=0; i<CSFocc.size(); i++)
@@ -1055,30 +1089,30 @@ void GamesAsciiParser::getCSF(std::istream& is)
   is.seekg(pivot_begin);
   if(!lookFor(is,"DETERMINANT CONTRIBUTION TO CSF'S"))
   {
-    cerr<<"Could not find CSF determinant contributions. Please use NPRT=2 in $CIDRT/DRT input section of gamess. \n";
+    std::cerr <<"Could not find CSF determinant contributions. Please use NPRT=2 in $CIDRT/DRT input section of gamess. \n";
     abort();
   }
   getwords(currentWords,is); // ----------------
   getwords(currentWords,is); // ----------------
   if(currentWords[0] != "CASE" || currentWords[1] != "VECTOR")
   {
-    cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (1). \n";
+    std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (1). \n";
     abort();
   }
   int ds=SpinMultiplicity-1;
   int neb= (NumberOfEls-ds)/2;
   int nea= NumberOfEls-NumberOfBeta;
   ci_nca = ci_ncb = NFZC;
-  vector<int> csfOccup;
+  std::vector<int> csfOccup;
   bool done=false,first=true;
   int cnt=1,current=0;
   int naea=0,naeb=0;
-  string aline;
+  std::string aline;
   while(current < ci_size)
   {
     if(is.eof())
     {
-      cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (2). \n";
+      std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (2). \n";
       abort();
     }
     getwords(currentWords,is);
@@ -1086,20 +1120,20 @@ void GamesAsciiParser::getCSF(std::istream& is)
     getwords(currentWords,is);
 // checking
     //if(currentWords[0] != "FOR" || currentWords[1] != "MS") {
-    //  cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (3). \n";
+    //  std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (3). \n";
     //  abort();
     //}
     getwords(currentWords,is,aline);
     if(aline.substr(1,3) != "CSF")
     {
-      cerr<<"aline:" <<aline <<endl;
-      cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (4). \n";
+      std::cerr <<"aline:" <<aline << std::endl;
+      std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (4). \n";
       abort();
     }
     if(coeff2csf[current].first == cnt)
       // read dets
     {
-// first time the string is longer
+// first time the std::string is longer
       csfOccup.clear();
       {
         std::string alp(ci_nstates,'0'),beta(ci_nstates,'0');
@@ -1116,13 +1150,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
             {
               if(nq-1 >= ci_nstates+ci_nca)
               {
-                cerr<<"Problems with det string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i <<endl;
-                cout<<"line: " <<aline <<endl;
-                cout<<"alpha: " <<alp <<endl;
-                cout<<"beta: " <<beta <<endl;
+                std::cerr <<"Problems with det std::string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i << std::endl;
+                std::cout <<"line: " <<aline << std::endl;
+                std::cout <<"alpha: " <<alp << std::endl;
+                std::cout <<"beta: " <<beta << std::endl;
                 for(int i=6; i<currentWords.size(); i++)
-                  cerr<<currentWords[i] <<" ";
-                cerr<<endl;
+                  std::cerr <<currentWords[i] <<" ";
+                std::cerr << std::endl;
                 abort();
               }
               alp.at(nq-1-ci_nca) = '1';
@@ -1132,13 +1166,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
             {
               if(-nq-1 >= ci_nstates+ci_ncb)
               {
-                cerr<<"Problems with det string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i <<endl;
-                cout<<"line: " <<aline <<endl;
-                cout<<"alpha: " <<alp <<endl;
-                cout<<"beta: " <<beta <<endl;
+                std::cerr <<"Problems with det std::string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i << std::endl;
+                std::cout <<"line: " <<aline << std::endl;
+                std::cout <<"alpha: " <<alp << std::endl;
+                std::cout <<"beta: " <<beta << std::endl;
                 for(int i=6; i<currentWords.size(); i++)
-                  cerr<<currentWords[i] <<" ";
-                cerr<<endl;
+                  std::cerr <<currentWords[i] <<" ";
+                std::cerr << std::endl;
                 abort();
               }
               beta.at(-nq-1-ci_ncb) = '1';
@@ -1159,13 +1193,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
             {
               if(nq-1 >= ci_nstates+ci_nca)
               {
-                cerr<<"Problems with det string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i <<endl;
-                cout<<"line: " <<aline <<endl;
-                cout<<"alpha: " <<alp <<endl;
-                cout<<"beta: " <<beta <<endl;
+                std::cerr <<"Problems with det std::string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i << std::endl;
+                std::cout <<"line: " <<aline << std::endl;
+                std::cout <<"alpha: " <<alp << std::endl;
+                std::cout <<"beta: " <<beta << std::endl;
                 for(int i=6; i<currentWords.size(); i++)
-                  cerr<<currentWords[i] <<" ";
-                cerr<<endl;
+                  std::cerr <<currentWords[i] <<" ";
+                std::cerr << std::endl;
                 abort();
               }
               alp.at(nq-1-ci_nca) = '1';
@@ -1175,13 +1209,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
             {
               if(-nq-1 >= ci_nstates+ci_ncb)
               {
-                cerr<<"Problems with det string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i <<endl;
-                cout<<"line: " <<aline <<endl;
-                cout<<"alpha: " <<alp <<endl;
-                cout<<"beta: " <<beta <<endl;
+                std::cerr <<"Problems with det std::string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i << std::endl;
+                std::cout <<"line: " <<aline << std::endl;
+                std::cout <<"alpha: " <<alp << std::endl;
+                std::cout <<"beta: " <<beta << std::endl;
                 for(int i=6; i<currentWords.size(); i++)
-                  cerr<<currentWords[i] <<" ";
-                cerr<<endl;
+                  std::cerr <<currentWords[i] <<" ";
+                std::cerr << std::endl;
                 abort();
               }
               beta.at(-nq-1-ci_ncb) = '1';
@@ -1190,13 +1224,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
           }
           if(na != naea || nb != naeb)
           {
-            cerr<<"Problems with det string #: " <<cnt <<endl;
-            cout<<"line: " <<aline <<endl;
-            cout<<"alpha: " <<alp <<endl;
-            cout<<"beta: " <<beta <<endl;
+            std::cerr <<"Problems with det std::string #: " <<cnt << std::endl;
+            std::cout <<"line: " <<aline << std::endl;
+            std::cout <<"alpha: " <<alp << std::endl;
+            std::cout <<"beta: " <<beta << std::endl;
             for(int i=6; i<currentWords.size(); i++)
-              cerr<<currentWords[i] <<" ";
-            cerr<<endl;
+              std::cerr <<currentWords[i] <<" ";
+            std::cerr << std::endl;
             abort();
           }
         }
@@ -1211,7 +1245,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
       {
         if(is.eof())
         {
-          cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (5). \n";
+          std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (5). \n";
           abort();
         }
         if(currentWords[0] == "CASE" && currentWords[1] == "VECTOR")
@@ -1219,7 +1253,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
           cnt++;
           if(cnt < 10000000 && atoi(currentWords[2].c_str()) != cnt)
           {
-            cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (6). \n";
+            std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (6). \n";
             abort();
           }
           break;
@@ -1236,13 +1270,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
           {
             if(nq-1 >= ci_nstates+ci_nca)
             {
-              cerr<<"Problems with det string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i <<endl;
-              cout<<"line: " <<aline <<endl;
-              cout<<"alpha: " <<alp <<endl;
-              cout<<"beta: " <<beta <<endl;
+              std::cerr <<"Problems with det std::string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i << std::endl;
+              std::cout <<"line: " <<aline << std::endl;
+              std::cout <<"alpha: " <<alp << std::endl;
+              std::cout <<"beta: " <<beta << std::endl;
               for(int i=6; i<currentWords.size(); i++)
-                cerr<<currentWords[i] <<" ";
-              cerr<<endl;
+                std::cerr <<currentWords[i] <<" ";
+              std::cerr << std::endl;
               abort();
             }
             alp.at(nq-1-ci_nca) = '1';
@@ -1251,13 +1285,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
           {
             if(-nq-1 >= ci_nstates+ci_ncb)
             {
-              cerr<<"Problems with det string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i <<endl;
-              cout<<"line: " <<aline <<endl;
-              cout<<"alpha: " <<alp <<endl;
-              cout<<"beta: " <<beta <<endl;
+              std::cerr <<"Problems with det std::string #,nq,i: " <<cnt <<"  " <<nq <<"  " <<i << std::endl;
+              std::cout <<"line: " <<aline << std::endl;
+              std::cout <<"alpha: " <<alp << std::endl;
+              std::cout <<"beta: " <<beta << std::endl;
               for(int i=6; i<currentWords.size(); i++)
-                cerr<<currentWords[i] <<" ";
-              cerr<<endl;
+                std::cerr <<currentWords[i] <<" ";
+              std::cerr << std::endl;
               abort();
             }
             beta.at(-nq-1-ci_ncb) = '1';
@@ -1279,7 +1313,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
       {
         if(is.eof())
         {
-          cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (5). \n";
+          std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (5). \n";
           abort();
         }
         if(currentWords[0] == "CASE" && currentWords[1] == "VECTOR")
@@ -1287,7 +1321,7 @@ void GamesAsciiParser::getCSF(std::istream& is)
           cnt++;
           if(cnt < 10000000 && atoi(currentWords[2].c_str()) != cnt)
           {
-            cerr<<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (6). \n";
+            std::cerr <<"Problems reading DETERMINANT CONTRIBUTION TO CSF'S (6). \n";
             abort();
           }
           break;
@@ -1296,8 +1330,8 @@ void GamesAsciiParser::getCSF(std::istream& is)
       }
     }
   }
-  cout<<"Done reading csf expansion." <<endl;
-  cout.flush();
+  std::cout <<"Done reading csf expansion." << std::endl;
+  std::cout.flush();
   ci_nea=0;
   for(int i=0; i<CSFalpha[0][0].size(); i++)
     if(CSFalpha[0][0].at(i)=='1')
@@ -1312,13 +1346,13 @@ void GamesAsciiParser::getCSF(std::istream& is)
 //  ci_nca = nea-ci_nea;
 //  ci_ncb = neb-ci_neb;
   /*
-    cout<<"Summary. #ci: " <<ci_size <<endl;
+    std::cout <<"Summary. #ci: " <<ci_size << std::endl;
     for(int i=0; i<ci_size; i++) {
-      cout<<"c: " <<coeff2csf[i].second <<endl;
+      std::cout <<"c: " <<coeff2csf[i].second << std::endl;
       for(int k=0; k<CSFexpansion[i].size(); k++)
-        cout<<"    " <<k <<"  " <<CSFexpansion[i][k]
+        std::cout <<"    " <<k <<"  " <<CSFexpansion[i][k]
             <<"  " <<CSFalpha[i][k]
-            <<"  " <<CSFbeta[i][k] <<endl;
+            <<"  " <<CSFbeta[i][k] << std::endl;
     }
   */
 }
@@ -1336,15 +1370,15 @@ void GamesAsciiParser::getCI(std::istream& is)
   {
     if(is.eof())
     {
-      cerr<<"Could not find CI expansion. \n";
+      std::cerr <<"Could not find CI expansion. \n";
       abort();
     }
-    getwords(currentWords,is);
-    if(currentWords.size() < 5 )
+    getwords(currentWords,is,0,std::string("|"));
+    if(currentWords.size() < 3 )
       continue;
-    if(currentWords[0] == "ALPHA" &&
-        currentWords[2] == "BETA" &&
-        currentWords[4] == "COEFFICIENT" )
+    if(currentWords[0].find("ALP") == 0 &&
+        currentWords[1].find("BET") == 0 &&
+        currentWords[2] == "COEFFICIENT" )
     {
       getwords(currentWords,is);  // --------
       notfound=false;
@@ -1371,7 +1405,7 @@ void GamesAsciiParser::getCI(std::istream& is)
       ci_neb++;
   if(CIalpha[0].size() != CIbeta[0].size())
   {
-    cerr<<"QMCPack can't handle different number of active orbitals in alpha and beta channels right now. Contact developers for help (Miguel).\n";
+    std::cerr <<"QMCPack can't handle different number of active orbitals in alpha and beta channels right now. Contact developers for help (Miguel).\n";
     abort();
   }
   int ds=SpinMultiplicity-1;
@@ -1391,24 +1425,24 @@ void GamesAsciiParser::getORMAS(std::istream& is)
   CIcoeff.clear();
   CIalpha.clear();
   CIbeta.clear();
-  string aline;
+  std::string aline;
   if(!lookFor(is,"NUMBER OF CORE ORBITALS",aline))
   {
-    cerr<<"Couldn't find # of CORE ORBITALS in ORMAS.\n";
+    std::cerr <<"Couldn't find # of CORE ORBITALS in ORMAS.\n";
     abort();
   }
   parsewords(aline.c_str(),currentWords);
   ci_nca = ci_ncb = atoi(currentWords[4].c_str());
   if(!lookFor(is,"NUMBER OF ACTIVE ORBITALS",aline))
   {
-    cerr<<"Couldn't find # of ACTIVE ORBITALS in ORMAS.\n";
+    std::cerr <<"Couldn't find # of ACTIVE ORBITALS in ORMAS.\n";
     abort();
   }
   parsewords(aline.c_str(),currentWords);
   int nactive(atoi(currentWords[4].c_str()));
   if(!lookFor(is,"NUMBER OF ALPHA ELECTRONS",aline))
   {
-    cerr<<"Couldn't find # of ALPHA ELECTRONS in ORMAS.\n";
+    std::cerr <<"Couldn't find # of ALPHA ELECTRONS in ORMAS.\n";
     abort();
   }
   parsewords(aline.c_str(),currentWords);
@@ -1416,13 +1450,13 @@ void GamesAsciiParser::getORMAS(std::istream& is)
   ci_nea = atoi(currentWords[6].c_str());
   if(!lookFor(is,"NUMBER OF BETA ELECTRONS",aline))
   {
-    cerr<<"Couldn't find # of BETA ELECTRONS in ORMAS.\n";
+    std::cerr <<"Couldn't find # of BETA ELECTRONS in ORMAS.\n";
     abort();
   }
   parsewords(aline.c_str(),currentWords);
   //ci_neb = atoi(currentWords[4].c_str());
   ci_neb = atoi(currentWords[6].c_str());
-  cout <<"ORMAS: nea,neb,ncore,nact: "
+  std::cout <<"ORMAS: nea,neb,ncore,nact: "
        <<ci_nea <<" "
        <<ci_neb <<" "
        <<ci_nca <<" "
@@ -1432,22 +1466,22 @@ void GamesAsciiParser::getORMAS(std::istream& is)
   int nea= NumberOfEls-NumberOfBeta;
   if( ci_nca != nea-ci_nea)
   {
-    cerr<<"Inconsistent number of core electrons: " <<ci_nca <<" " <<nea-ci_nea <<endl;
+    std::cerr <<"Inconsistent number of core electrons: " <<ci_nca <<" " <<nea-ci_nea << std::endl;
     abort();
   }
   if( ci_ncb != neb-ci_neb)
   {
-    cerr<<"Inconsistent number of core electrons: " <<ci_ncb <<" " <<neb-ci_neb <<endl;
+    std::cerr <<"Inconsistent number of core electrons: " <<ci_ncb <<" " <<neb-ci_neb << std::endl;
     abort();
   }
-  string dummy_alpha(nactive,'0');
-  string dummy_beta(nactive,'0');
+  std::string dummy_alpha(nactive,'0');
+  std::string dummy_beta(nactive,'0');
   int nskip = ci_nea+ci_neb+2;
   do
   {
     if(is.eof())
     {
-      cerr<<"Could not find ORMAS CI expansion. \n";
+      std::cerr <<"Could not find ORMAS CI expansion. \n";
       abort();
     }
     getwords(currentWords,is);
@@ -1494,13 +1528,13 @@ void GamesAsciiParser::getORMAS(std::istream& is)
         break;
       }
     }
-    //cout<<i <<" " <<max <<endl;
+    //cout<<i <<" " <<max << std::endl;
     if(ci_nstates < max)
       ci_nstates=max;
   }
 }
 
-double GamesAsciiParser::getCSFSign(vector<int> & occ)
+double GamesAsciiParser::getCSFSign(std::vector<int> & occ)
 {
 // reference ordering is irrelevant as long as it is consistent
 // within all determinants.

@@ -1,19 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2005-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Raymond Clay III, j.k.rofling@gmail.com, Lawrence Livermore National Laboratory
+//                    Mark Dewing, markdewing@gmail.com, University of Illinois at Urbana-Champaign
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 #ifndef LIBXML2_DOCUMENT_H
 #define LIBXML2_DOCUMENT_H
 #include "OhmmsData/libxmldefs.h"
@@ -85,6 +86,7 @@ struct Libxml2Document
   ~Libxml2Document();
 
   bool parse(const std::string& fname);
+  bool parseFromString(const std::string& data);
 
   inline xmlDocPtr getDocument()
   {
@@ -109,7 +111,7 @@ struct Libxml2Document
 
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: j.k.rofling@gmail.com $
- * $Revision: 6235 $   $Date: 2014-02-18 14:31:33 -0800 (Tue, 18 Feb 2014) $
- * $Id: Libxml2Doc.h 6235 2014-02-18 22:31:33Z j.k.rofling@gmail.com $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: Libxml2Doc.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

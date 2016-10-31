@@ -1,3 +1,22 @@
+#//////////////////////////////////////////////////////////////////////////////////////
+#// This file is distributed under the University of Illinois/NCSA Open Source License.
+#// See LICENSE file in top directory for details.
+#//
+#// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+#//
+#// File developed by: John R. Gergely,  University of Illinois at Urbana-Champaign
+#//                    D.C. Yang, University of Illinois at Urbana-Champaign
+#//                    Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+#//                    Raymond Clay III, j.k.rofling@gmail.com, Lawrence Livermore National Laboratory
+#//                    Ye Luo, yeluo@anl.gov, Argonne National Laboratory
+#//                    Jaron T. Krogel, krogeljt@ornl.gov, Oak Ridge National Laboratory
+#//
+#// File created by: John R. Gergely,  University of Illinois at Urbana-Champaign
+#//////////////////////////////////////////////////////////////////////////////////////
+    
+    
 SET(HAMSRCS
   QMCHamiltonianBase.cpp
   QMCHamiltonian.cpp
@@ -15,15 +34,11 @@ SET(HAMSRCS
   ForceBase.cpp
   HamiltonianFactory.cpp
   CoulombPotentialFactory.cpp
-  ../Estimators/TraceManager.cpp
   HarmonicExternalPotential.cpp
-  SpinDensity.cpp
   StaticStructureFactor.cpp
-  ../Estimators/PostProcessor.cpp
-  ../Estimators/SpinDensityPostProcessor.cpp
   OrbitalImages.cpp
-  DensityMatrices1B.cpp
-)
+  SpinDensity.cpp
+  )
 #  FSAtomPseudoPot.cpp
 
 IF(OHMMS_DIM MATCHES 3)
@@ -47,10 +62,20 @@ IF(OHMMS_DIM MATCHES 3)
     ECPComponentBuilder.cpp
     ECPComponentBuilder.1.cpp
     ECPComponentBuilder.2.cpp
-    ReferencePoints.cpp
-    SpaceGrid.cpp
-    EnergyDensityEstimator.cpp
     )
+
+
+  IF(NOT REMOVE_TRACEMANAGER)
+    SET(HAMSRCS ${HAMSRCS}
+      ../Estimators/TraceManager.cpp
+      ReferencePoints.cpp
+      SpaceGrid.cpp
+      EnergyDensityEstimator.cpp
+      DensityMatrices1B.cpp
+      ../Estimators/PostProcessor.cpp
+      ../Estimators/SpinDensityPostProcessor.cpp
+      )
+  ENDIF()
 
   IF(HAVE_LIBFFTW)
     SET(HAMSRCS ${HAMSRCS} MPC.cpp VHXC.cpp)

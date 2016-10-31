@@ -1,21 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
-/*! \author Jeongnim Kim
- */
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #ifndef QMCPLUSPLUS_MOLECULARORBITALBASIS_H
 #define QMCPLUSPLUS_MOLECULARORBITALBASIS_H
 
@@ -252,14 +251,14 @@ public:
   int TotalBasis;
   ///container for the id's of the centers (ions),
   ///several centers may share the same id
-  vector<int>  I;
+  std::vector<int>  I;
   ///container to store the offsets of the basis functions,
   ///the number of basis states for center J is Basis[J+1]-Basis[J]
-  vector<int>  Basis;
+  std::vector<int>  Basis;
   ///container for the pointers to the Atomic Orbitals,
   ///the size of this container being determined by the number
   ///of unique centers
-  vector<COT*> AOs;
+  std::vector<COT*> AOs;
   ///matrix to store values \f$ Y[i,j] = \phi_j(r_i) \f$
   Matrix<ValueType> Y;
   ///matrix to store gradients \f$ dY[i,j] = {\bf \nabla}_i \phi_j(r_i) \f$
@@ -274,8 +273,8 @@ public:
 #endif
 
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: MolecularOrbitalBasis.h 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: MolecularOrbitalBasis.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/
 

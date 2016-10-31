@@ -1,18 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003 by Jeongnim Kim and Jordan Vincent
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include "Utilities/OhmmsInfo.h"
 #include "Numerics/LibxmlNumericIO.h"
 #include "Numerics/SlaterTypeOrbital.h"
@@ -20,7 +22,6 @@
 #include "Numerics/OneDimCubicSpline.h"
 #include "QMCWaveFunctions/MolecularOrbitals/GridMolecularOrbitals.h"
 #include "QMCWaveFunctions/MolecularOrbitals/STO2GridBuilder.h"
-using namespace std;
 namespace qmcplusplus
 {
 
@@ -57,7 +58,7 @@ STO2GridBuilder::addRadialOrbital(xmlNodePtr cur,
   xmlNodePtr s = cur->xmlChildrenNode;
   while(s != NULL)
   {
-    string cname((const char*)(s->name));
+    std::string cname((const char*)(s->name));
     if(cname == "parameter" || cname =="Var")
     {
       putContent(zeta,s);
@@ -81,7 +82,7 @@ STO2GridBuilder::addRadialOrbital(xmlNodePtr cur,
 }
 }
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: STO2GridBuilder.cpp 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: STO2GridBuilder.cpp 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

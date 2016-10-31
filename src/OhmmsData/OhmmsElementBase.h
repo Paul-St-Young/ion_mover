@@ -1,19 +1,19 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 #ifndef OHMMS_XMLDATA_H
 #define OHMMS_XMLDATA_H
 /**@file OhmmsElementBase.h
@@ -85,10 +85,10 @@ public:
     myIOMode = imode;
   }
 
-  ///write to a ostream
+  ///write to a std::ostream
   virtual bool get(std::ostream& ) const = 0;
 
-  ///read from istream
+  ///read from std::istream
   virtual bool put(std::istream& ) = 0;
 
   ///read from an xmlNode
@@ -107,7 +107,7 @@ public:
   void put(const std::string& s)
   {
     std::istringstream stream(s);
-    put(stream);
+    put( stream);
   }
 
   ///write the start of a node
@@ -136,7 +136,7 @@ inline void tolower(std::string& s)
 
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: OhmmsElementBase.h 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: OhmmsElementBase.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

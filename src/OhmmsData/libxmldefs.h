@@ -1,19 +1,21 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jaron T. Krogel, krogeljt@ornl.gov, Oak Ridge National Laboratory
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
 #ifndef ESTOOLS_OHMMS_LIBXML_DEF_H
 #define ESTOOLS_OHMMS_LIBXML_DEF_H
 #include <libxml/xmlmemory.h>
@@ -67,7 +69,9 @@ bool putContent(T& a, xmlNodePtr cur)
 {
   std::istringstream
   stream((const char*)(xmlNodeListGetString(cur->doc, cur->xmlChildrenNode, 1)));
-  return stream >> a;
+  stream >> a;
+  return stream.good();
+  //return stream >> a;
 }
 
 template<class IT>
@@ -78,7 +82,9 @@ bool putContent(IT first, IT last, xmlNodePtr cur)
   bool success=true;
   while(success && first!=last)
   {
-    success=(stream >> *first++);
+    stream >> *first++;
+    success=stream.good();
+    //success=( stream >> *first++);
   }
   return success;
 }
@@ -105,8 +111,8 @@ bool getContent(const T& a, xmlNodePtr cur)
   return true;
 }
 
-/** assign vector<T> from a node. Create a temporary vector and make assignment.
- *\param a reference vector<T>
+/** assign std::vector<T> from a node. Create a temporary vector and make assignment.
+ *\param a reference std::vector<T>
  *\param cur current node to which a content is copied
  *\return ture if successful
  *
@@ -125,7 +131,7 @@ putContent(std::vector<T>& a, xmlNodePtr cur)
   T t;
   while(!stream.eof())
   {
-    if(stream >> t)
+    if( stream >> t)
       b.push_back(t);
   }
   a = b;
@@ -133,7 +139,7 @@ putContent(std::vector<T>& a, xmlNodePtr cur)
 }
 
 /** write std::vector<T> to node. Each element is separated by a space.
- *\param a reference vector<T>
+ *\param a reference std::vector<T>
  *\param cur current node to which a content is copied
  *\return ture if successful
  *
@@ -157,7 +163,7 @@ getContent(const std::vector<T>& a, xmlNodePtr cur)
 
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: jnkim $
- * $Revision: 5891 $   $Date: 2013-07-01 11:37:14 -0700 (Mon, 01 Jul 2013) $
- * $Id: libxmldefs.h 5891 2013-07-01 18:37:14Z jnkim $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: libxmldefs.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

@@ -1,18 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003 by Jeongnim Kim and Jordan Vincent
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 #include "Utilities/OhmmsInfo.h"
 #include "Numerics/LibxmlNumericIO.h"
 #include "Numerics/OneDimCubicSpline.h"
@@ -22,7 +24,6 @@
 #include "QMCTools/GridMolecularOrbitals.h"
 #include "QMCTools/RGFBuilderBase.h"
 #include "QMCFactory/OneDimGridFactory.h"
-using namespace std;
 namespace qmcplusplus
 {
 
@@ -42,7 +43,7 @@ RGFBuilderBase::~RGFBuilderBase()
  * @param aroot filename
  * @param omode mode, 0=check cubic spline quality, 1=ascii and 2=hdf5
  */
-void RGFBuilderBase::print(const string& aroot, int omode)
+void RGFBuilderBase::print(const std::string& aroot, int omode)
 {
   enum {DEBUG_OUTPUT=0, ASCII_OUTPUT, HDF_OUTPUT};
   if(omode == DEBUG_OUTPUT)
@@ -53,9 +54,9 @@ void RGFBuilderBase::print(const string& aroot, int omode)
       RadialOrbitalType* radorb = m_orbitals->Rnl[i];
       char fname[128];
       sprintf(fname,"%s.%d.dat",aroot.c_str(), i);
-      ofstream dfile(fname);
-      dfile.setf(ios::scientific, ios::floatfield);
-      dfile.setf(ios::left,ios::adjustfield);
+      std::ofstream dfile(fname);
+      dfile.setf(std::ios::scientific, std::ios::floatfield);
+      dfile.setf(std::ios::left,std::ios::adjustfield);
       dfile.precision(12);
       for(int ig=0; ig<agrid.size()-1; ig++)
       {
@@ -66,9 +67,9 @@ void RGFBuilderBase::print(const string& aroot, int omode)
           //setgrid is removed.  The GridManager functor will re-evaluate the grid parameters.
           //radorb->setgrid(_r);
           y = radorb->evaluate(_r,1.0/_r,dy,d2y);
-          dfile << setw(24) << _r << setw(24) << y
-                << setw(24) << dy << setw(24) << d2y
-                << endl;
+          dfile << std::setw(24) << _r << std::setw(24) << y
+                << std::setw(24) << dy << std::setw(24) << d2y
+                << std::endl;
           _r+=dr;
         }
       }
@@ -80,25 +81,25 @@ void RGFBuilderBase::print(const string& aroot, int omode)
       GridType& agrid(m_orbitals->Rnl[0]->grid());
       char fname[128];
       sprintf(fname,"%s.combo.dat",aroot.c_str());
-      ofstream dfile(fname);
-      dfile.setf(ios::scientific, ios::floatfield);
-      dfile.setf(ios::left,ios::adjustfield);
+      std::ofstream dfile(fname);
+      dfile.setf(std::ios::scientific, std::ios::floatfield);
+      dfile.setf(std::ios::left,std::ios::adjustfield);
       int norb = m_orbitals->Rnl.size();
-      dfile << "# column 0 : Radial grid" << endl;
+      dfile << "# column 0 : Radial grid" << std::endl;
       for(int i=0; i<norb; i++)
       {
-        dfile << "# column " << i+1 << " :  " << m_orbitals->RnlID[i] << endl;
+        dfile << "# column " << i+1 << " :  " << m_orbitals->RnlID[i] << std::endl;
       }
       dfile.precision(15);
       for(int ig=0; ig<agrid.size()-1; ig++)
       {
         RealType _r = agrid(ig);
-        dfile << setw(30) << _r;
+        dfile << std::setw(30) << _r;
         for(int i=0; i<norb; i++)
         {
-          dfile << setw(30) << m_orbitals->Rnl[i]->operator()(ig);
+          dfile << std::setw(30) << m_orbitals->Rnl[i]->operator()(ig);
         }
-        dfile << endl;
+        dfile << std::endl;
       }
     }
 }
@@ -164,7 +165,7 @@ RGFBuilderBase::addGrid(xmlNodePtr cur)
 }
 }
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: RGFBuilderBase.cpp 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: RGFBuilderBase.cpp 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/

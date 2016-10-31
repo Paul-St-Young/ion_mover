@@ -1,20 +1,20 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2006- by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   Jeongnim Kim
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+
+
 /**@file BMakeFunc.h
  * @brief Declaration of BMakeFunc
  */
@@ -30,12 +30,12 @@ struct BMakeFuncBase
   int L;
   int M;
   int RadFuncType;
-  vector<double> exponent;
-  vector<double> contraction;
-  vector<int> node;
-  string BasisID;
+  std::vector<double> exponent;
+  std::vector<double> contraction;
+  std::vector<int> node;
+  std::string BasisID;
 
-  static vector<double> YlmNorm;
+  static std::vector<double> YlmNorm;
   static void init();
 
   BMakeFuncBase():
@@ -92,16 +92,16 @@ struct BMakeFuncBase
     node.push_back(n);
   }
 
-  void get(ostream& os)
+  void get(std::ostream& os)
   {
-    os << BasisID << " n,l,m " << N << " " << L << " " << M << endl;
+    os << BasisID << " n,l,m " << N << " " << L << " " << M << std::endl;
     for(int i=0; i<exponent.size(); i++)
     {
-      cout << " " << exponent[i] << " " << contraction[i]
-           << " " << node[i] << endl;
+      std::cout << " " << exponent[i] << " " << contraction[i]
+           << " " << node[i] << std::endl;
     }
   }
-  virtual void put(vector<string>& words) = 0;
+  virtual void put(std::vector<std::string>& words) = 0;
 };
 
 
@@ -110,7 +110,7 @@ BMakeFuncBase* createBMakeFunc(int iflag);
 
 #endif
 /***************************************************************************
- * $RCSfile$   $Author: jmcminis $
- * $Revision: 5794 $   $Date: 2013-04-25 17:14:53 -0700 (Thu, 25 Apr 2013) $
- * $Id: BMakeFunc.h 5794 2013-04-26 00:14:53Z jmcminis $
+ * $RCSfile$   $Author: abenali $
+ * $Revision: 7138 $   $Date: 2016-09-27 18:45:29 -0500 (Tue, 27 Sep 2016) $
+ * $Id: BMakeFunc.h 7138 2016-09-27 23:45:29Z abenali $
  ***************************************************************************/
