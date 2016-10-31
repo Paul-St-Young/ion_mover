@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<simulation>
+  <project id="qmc.tw0" series="0"/>
+  <random seed="-1"/>        <!-- time-based parallel random seeds -->
+<!--  <interface>
+      <particleset type="ESHDF" href="H_He.pwscf.h5"/>
+      <sposet type="ESHDF" href="H_He.pwscf.h5"/>
+  </interface>  -->
+  <interface>
+      <particleset type="ESPWSCF" href="scf.in" source="ion0" target="e"/>
+      <sposet type="ESPWSCF" href="scf.in"/>
+  </interface> 
+<qmcsystem>
+  <wavefunction name="psi0" target="e">
+      <determinantset type="bspline" sort="1" tilematrix="1 0 0 0 1 0 0 0 1" twistnum="0" source="ion0" version="0.10">
+        <slaterdeterminant>
+          <determinant id="updet" size="32">
+            <occupation mode="ground" spindataset="0">
+            </occupation>
+          </determinant>
+          <determinant id="downdet" size="32">
+            <occupation mode="ground" spindataset="0">
+            </occupation>
+          </determinant>
+        </slaterdeterminant>
+      </determinantset>
+      <jastrow name="J2" type="Two-Body" function="Bspline" print="yes">
+        <correlation speciesA="u" speciesB="u" size="10">
+          <coefficients id="uu" type="Array"> 0.337061783 0.2631538072 0.2014372526 0.1504593758 0.1090915997 0.07579151449 0.04987980597 0.03027554242 0.01602243109 0.006638326232</coefficients>
+        </correlation>
+        <correlation speciesA="u" speciesB="d" size="10">
+          <coefficients id="ud" type="Array"> 0.511498787 0.3739764282 0.2673587414 0.1864769148 0.1271556914 0.08462736283 0.05432375281 0.03274868827 0.01737813996 0.007284417793</coefficients>
+        </correlation>
+      </jastrow>
+      <jastrow name="J1L" type="One-Body" function="Bspline" source="ion0" print="yes">
+        <correlation elementType="H" size="8">
+          <coefficients id="eH_L" type="Array" cusp="0"> -0.04825937728 -0.1315755687 -0.104035227 -0.08077395309 -0.0546381395 -0.032071012 -0.01553551361 -0.005847589214</coefficients>
+        </correlation>
+	<correlation elementType="He" size="8">
+          <coefficients id="eHe_L" type="Array" cusp="0"> -0.09977543146 -0.3250870523 -0.2290861323 -0.1642912675 -0.1064535485 -0.06087251419 -0.02954823759 -0.0111531062</coefficients>
+	</correlation>
+      </jastrow>
+      <jastrow name="J1S" type="One-Body" function="Bspline" source="ion0" print="yes">
+        <correlation elementType="H" size="8" rcut="1" cusp="1">
+          <coefficients id="eH_S" type="Array"> -0.124173355 -0.04083217108 -0.007964082367 -0.0009004918764 0.002148172683 0.006656571699 0.007754905833 0.003424632101</coefficients>
+        </correlation>
+        <correlation elementType="He" size="8" rcut="1" cusp="2">
+          <coefficients id="eHe_S" type="Array"> -0.2882302559 -0.1091877212 -0.02267419006 0.004590046822 0.01354672876 0.02649887736 0.03131263481 0.01500381319</coefficients>
+        </correlation>
+      </jastrow>
+    </wavefunction>
+<hamiltonian name="h0" type="generic" target="e">
+      <pairpot name="ElecElec" type="coulomb" source="e" target="e"/>
+      <pairpot name="IonIon" type="coulomb" source="ion0" target="ion0"/>
+      <pairpot name="ElecIon" type="coulomb" source="ion0" target="e"/>
+   </hamiltonian>
+</qmcsystem>
+<qmc checkpoint="1" method="vmc" move="pbyp" multiple="no" warp="no">
+    <estimator hdf5="no" name="LocalEnergy"/>
+    <parameter name="useDrift">yes</parameter>
+    <parameter name="blocks">2550</parameter>
+    <parameter name="steps">16</parameter>
+    <parameter name="walkers">64</parameter>
+    <parameter name="warmupsteps">0</parameter>
+    <parameter name="timestep">0.5</parameter>
+  </qmc>
+  <qmc checkpoint="20" method="dmc" move="pbyp" multiple="no" warp="no">
+    <estimator hdf5="no" name="LocalEnergy"/>
+    <parameter name="nonlocalmoves"> yes </parameter>
+    <parameter name="blocks">1400</parameter>
+    <parameter name="steps">16</parameter>
+    <parameter name="warmupsteps">6</parameter>
+    <parameter name="timestep">0.1e-1</parameter>
+  </qmc>
+
+</simulation>
