@@ -5,8 +5,10 @@
   verbosity = 'high' ,
   pseudo_dir = './' ,
   outdir = './' ,
+  disk_io = 'none'
   tstress = .true. ,
   tprnfor = .true. ,
+  wf_collect = .false.
 /
 &SYSTEM
   ibrav = 0 ,

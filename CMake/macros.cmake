@@ -12,11 +12,10 @@ ENDFUNCTION()
 # Macro to add the dependencies and libraries to an executable
 MACRO( ADD_QMC_EXE_DEP EXE )
     # Add the package dependencies
-    TARGET_LINK_LIBRARIES(${EXE} qmc qmcdriver qmcham qmcwfs interface qmcbase qmcutil adios_config)
+    TARGET_LINK_LIBRARIES(${EXE} qmc qmcdriver qmcham qmcwfs qmcbase qmcutil adios_config)
     FOREACH(l ${QMC_UTIL_LIBS})
         TARGET_LINK_LIBRARIES(${EXE} ${l})
     ENDFOREACH(l ${QMC_UTIL_LIBS})
-    TARGET_LINK_LIBRARIES(${EXE} ${LAPACK_LIBRARY} ${BLAS_LIBRARY} ${FORTRAN_LIBRARIES})
     IF(ENABLE_TAU_PROFILE)
         TARGET_LINK_LIBRARIES(${EXE} tau)
     ENDIF(ENABLE_TAU_PROFILE)
@@ -25,6 +24,29 @@ MACRO( ADD_QMC_EXE_DEP EXE )
     ENDIF(MPI_LIBRARY)
 ENDMACRO()
 
+#############################################################
+# Add tests to ctest
+#############################################################
+# Useful macros to compile and run an executable:
+#   ADD_QMC_PROVISIONAL_TEST( EXECFILE )
+#       Add a provisional test that will be compiled 
+#       but not executed
+#   ADD_QMC_TEST( EXECFILE ARGS )
+#       Add a serial test passing the given args to the test
+#   ADD_QMC_TEST_PARALLEL( EXECFILE PROCS ARGS )
+#       Add a parallel test with the given number of
+#       processors and arguments
+#   ADD_QMC_TEST_1_2_4( EXECFILE args )
+#       Add a test that will run on 1, 2, and 4 processors
+#   ADD_QMC_WEEKLY_TEST( EXECFILE PROCS ARGS )
+#       Add a "WEEKLY" parallel test with the given number 
+#       of processors and arguments
+#   ADD_QMC_TEST_THREAD_MPI( EXECFILE PROCS THREADS ARGS )
+#       Add a parallel test with the given number of threads
+#       per processes
+# Useful macros to run an existing executable:
+#   RUN_QMC_APP( TESTNAME SRC_DIR PROCS THREADS ARGS )
+#############################################################
 
 # Add a provisional test
 FUNCTION( ADD_QMC_PROVISIONAL_TEST EXEFILE )
@@ -159,7 +181,7 @@ MACRO( ADD_QMC_TEST_THREAD_MPI EXEFILE PROCS THREADS ${ARGN} )
     STRING(REGEX REPLACE "\\$\\(Configuration\\)" "${CONFIGURATION}" EXE "${EXE}" )
     CREATE_TEST_NAME( "${EXEFILE}_${PROCS}procs_${THREADS}threads" ${ARGN} )
     MATH( EXPR TOT_PROCS "${PROCS} * ${THREADS}" )
-    IF ( ${PROCS} GREATER ${TEST_MAX_PROCS} )
+    IF ( ${TOT_PROCS} GREATER ${TEST_MAX_PROCS} )
         MESSAGE("Disabling test ${TESTNAME} (exceeds maximum number of processors ${TEST_MAX_PROCS})")
     ELSEIF ( ( ${PROCS} STREQUAL "1" ) AND NOT USE_EXT_MPI_FOR_SERIAL_TESTS )
         ADD_TEST( ${TESTNAME} ${CMAKE_CURRENT_BINARY_DIR}/${EXEFILE} ${ARGN} )
@@ -171,26 +193,93 @@ MACRO( ADD_QMC_TEST_THREAD_MPI EXEFILE PROCS THREADS ${ARGN} )
 ENDMACRO()
 
 
-# Runs qmcapp
-FUNCTION( RUN_QMC_APP TESTNAME SRC_DIR PROCS THREADS ${ARGN} )
+# Runs qmcpack
+#  Note that TEST_ADDED is an output variable
+FUNCTION( RUN_QMC_APP TESTNAME SRC_DIR PROCS THREADS TEST_ADDED ${ARGN} )
     COPY_DIRECTORY( "${SRC_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME}" )
     EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_directory "${SRC_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME}" )
-    SET( THREADS 1 )
+    #MESSAGE("RUN_QMC_APP2: TESTNAME = ${TESTNAME} SRC_DIR=${SRC_DIR} PROCS = ${PROCS} THREADS = ${THREADS}")
     MATH( EXPR TOT_PROCS "${PROCS} * ${THREADS}" )
-    SET( QMC_APP "${qmcpack_BINARY_DIR}/bin/qmcapp" )
-    IF ( ${PROCS} GREATER ${TEST_MAX_PROCS} )
-        MESSAGE("Disabling test ${TESTNAME} (exceeds maximum number of processors ${TEST_MAX_PROCS})")
-    ELSEIF ( ( ${PROCS} STREQUAL "1" ) AND NOT USE_EXT_MPI_FOR_SERIAL_TESTS )
-        ADD_TEST( ${TESTNAME} ${QMC_APP} ${ARGN} )
-        SET_TESTS_PROPERTIES( ${TESTNAME} PROPERTIES FAIL_REGULAR_EXPRESSION "${TEST_FAIL_REGULAR_EXPRESSION}" 
-            PROCESSORS ${TOT_PROCS} WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME}" 
-            ENVIRONMENT OMP_NUM_THREADS=${THREADS} )
-    ELSEIF ( USE_MPI )
-        ADD_TEST( ${TESTNAME} ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${PROCS} ${QMC_APP} ${ARGN} )
-        SET_TESTS_PROPERTIES( ${TESTNAME} PROPERTIES FAIL_REGULAR_EXPRESSION "${TEST_FAIL_REGULAR_EXPRESSION}" 
-            PROCESSORS ${TOT_PROCS} WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME}" 
-            ENVIRONMENT OMP_NUM_THREADS=${THREADS} )
+    SET( QMC_APP "${qmcpack_BINARY_DIR}/bin/qmcpack" )
+    SET( ${TEST_ADDED} FALSE PARENT_SCOPE )
+    IF ( USE_MPI )
+        IF ( ${TOT_PROCS} GREATER ${TEST_MAX_PROCS} )
+            MESSAGE("Disabling test ${TESTNAME} (exceeds maximum number of processors ${TEST_MAX_PROCS})")
+        ELSEIF ( USE_MPI )
+            ADD_TEST( ${TESTNAME} ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${PROCS} ${QMC_APP} ${ARGN} )
+            SET_TESTS_PROPERTIES( ${TESTNAME} PROPERTIES FAIL_REGULAR_EXPRESSION "${TEST_FAIL_REGULAR_EXPRESSION}" 
+                PROCESSORS ${TOT_PROCS} WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME}" 
+                ENVIRONMENT OMP_NUM_THREADS=${THREADS} )
+            SET( ${TEST_ADDED} TRUE PARENT_SCOPE )
+        ENDIF()
+    ELSE()
+        IF ( ( ${PROCS} STREQUAL "1" ) )
+            ADD_TEST( ${TESTNAME} ${QMC_APP} ${ARGN} )
+            SET_TESTS_PROPERTIES( ${TESTNAME} PROPERTIES FAIL_REGULAR_EXPRESSION "${TEST_FAIL_REGULAR_EXPRESSION}" 
+                PROCESSORS ${TOT_PROCS} WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME}" 
+                ENVIRONMENT OMP_NUM_THREADS=${THREADS} )
+            SET( ${TEST_ADDED} TRUE PARENT_SCOPE )
+        ENDIF()
     ENDIF()
+
 ENDFUNCTION()
 
 
+# Add a test run and associated scalar checks
+# BASE_NAME - name of test (number of MPI processes, number of threads, and value to check (if applicable)
+#             will be appended to get the full test name)
+# BASE_DIR - source location of test input files
+# PREFIX - prefix for output files
+# INPUT_FILE - XML input file to QMCPACK
+# PROCS - number of MPI processes
+# THREADS - number of OpenMP threads
+# SCALAR_VALUES - list of output values to check with check_scalars.py
+#                 The list entries alternate between the value name and the value (usually a string with the
+#                 both the average and error).
+# SERIES - series index to compute
+# SHOULD_SUCCEED - whether the test is expected to pass or fail.  Expected failing tests will not have
+#                  the scalar tests added.
+
+FUNCTION(QMC_RUN_AND_CHECK BASE_NAME BASE_DIR PREFIX INPUT_FILE PROCS THREADS SCALAR_VALUES SERIES SHOULD_SUCCEED)
+    # Map from name of check to appropriate flag for check_scalars.py
+    LIST(APPEND SCALAR_CHECK_TYPE "kinetic" "totenergy" "eeenergy" "samples" "potential" "ionion" "localecp" "nonlocalecp" "flux")
+    LIST(APPEND CHECK_SCALAR_FLAG "--ke"    "--le"      "--ee"     "--ts"    "--lp"      "--ii"       "--lpp"    "--nlpp"      "--fl")
+
+    SET( TEST_ADDED FALSE )
+    SET( FULL_NAME "${BASE_NAME}-${PROCS}-${THREADS}" )
+    MESSAGE("Adding test ${FULL_NAME}")
+    RUN_QMC_APP(${FULL_NAME} ${BASE_DIR} ${PROCS} ${THREADS} TEST_ADDED ${INPUT_FILE})
+    IF ( TEST_ADDED )
+        SET_PROPERTY(TEST ${FULL_NAME} APPEND PROPERTY LABELS "QMCPACK")
+    ENDIF()
+
+
+    IF ( TEST_ADDED AND NOT SHOULD_SUCCEED)
+        SET_PROPERTY(TEST ${FULL_NAME} APPEND PROPERTY WILL_FAIL TRUE)
+        #MESSAGE("Test ${FULL_NAME} should fail")
+    ENDIF()
+
+    IF ( TEST_ADDED AND SHOULD_SUCCEED)
+        FOREACH(SCALAR_CHECK IN LISTS SCALAR_CHECK_TYPE)
+            LIST(FIND ${SCALAR_VALUES} ${SCALAR_CHECK} IDX1)
+            IF (IDX1 GREATER -1)
+                LIST(FIND SCALAR_CHECK_TYPE ${SCALAR_CHECK} IDX)
+                LIST(GET CHECK_SCALAR_FLAG ${IDX} FLAG)
+
+                MATH( EXPR IDX2 "${IDX1} + 1")
+                LIST(GET ${SCALAR_VALUES} ${IDX2} VALUE)
+
+                SET( TEST_NAME "${FULL_NAME}-${SCALAR_CHECK}" )
+                #MESSAGE("Adding scalar check ${TEST_NAME}")
+                SET(CHECK_CMD ${CMAKE_SOURCE_DIR}/utils/check_scalars.py --ns 3 --series ${SERIES} -p ${PREFIX} -e 2 ${FLAG} ${VALUE})
+                #MESSAGE("check command = ${CHECK_CMD}")
+                ADD_TEST( NAME ${TEST_NAME}
+                    COMMAND ${CHECK_CMD}
+                    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${FULL_NAME}"
+                )
+                SET_PROPERTY( TEST ${TEST_NAME} APPEND PROPERTY DEPENDS ${FULL_NAME} )
+                SET_PROPERTY( TEST ${TEST_NAME} APPEND PROPERTY LABELS "QMCPACK-checking-results" )
+            ENDIF()
+        ENDFOREACH(SCALAR_CHECK)
+    ENDIF()
+ENDFUNCTION()
