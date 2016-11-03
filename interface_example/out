@@ -1,0 +1,45 @@
+Rank =    0  Free Memory =  7727 MB
+Rank =    1  Free Memory =  7727 MB
+  Input file(s): qmc.tw0.main.xml 
+
+=====================================================
+                    QMCPACK 1.0.0 
+
+  (c) Copyright 2003-  QMCPACK developers            
+
+  Subversion branch 0
+  Last modified     2001-01-01
+=====================================================
+  Global options 
+  async_swap=0 : using blocking send/recv for walker swaps 
+
+  MPI Nodes            = 2
+  MPI Nodes per group  = 2
+  MPI Group ID         = 0
+  OMP_NUM_THREADS      = 1
+  Input XML = qmc.tw0.main.xml
+
+  Project = qmc.tw0
+  date    = 2016-11-03 15:04:22 CDT
+  host    = kylin.physics.illinois.edu
+  user    = yyang173
+
+  DO NOT READ DENSITY
+  Offset for the random number seeds based on time 70
+  Random number offset = 70  seeds = 359-373
+         359         367         373         379         383         389
+  Random seeds Node = 0:         373
+===Initializing Interface===
+~~~~ RANK 0
+  found particleset tag in interface.  put
+  Random seeds Node = 1:         379
+~~~~ RANK 1
+ putParticleSet(..).  Found the following parameters...
+  ifacetype=ESPWSCF sourcepath=scf.in
+In ESPWSCF...
+ptclinterface=0
+Create ESPWSCF from scratch...
+  found sposet tag in interface.  put
+ESPWSCFInterface::initialize().  initialized=0
+Fatal Error. Aborting at ParticleSet::resetGroups() Failed. No species exisits
+application called MPI_Abort(MPI_COMM_WORLD, 1) - process 1

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PWINTERFACE_HOME=/home/yyang173/soft/IonMover/src/Interfaces/PWSCF
+export PWINTERFACE_HOME=./src/Interfaces/PWSCF
 
 mkdir build
 cd build
