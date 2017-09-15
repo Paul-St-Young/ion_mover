@@ -1,24 +1,26 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
-//   Tel:    217-244-6319 (NCSA) 217-333-3324 (MCC)
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Raymond Clay III, j.k.rofling@gmail.com, Lawrence Livermore National Laboratory
+//                    Ye Luo, yeluo@anl.gov, Argonne National Laboratory
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
 #include "QMCWaveFunctions/Jastrow/kSpaceJastrow.h"
 #include "LongRange/StructFact.h"
 #include "Numerics/e2iphi.h"
 #include <sstream>
 #include <algorithm>
+
 
 namespace qmcplusplus
 {
@@ -134,20 +136,20 @@ struct magLess
 bool
 kSpaceJastrow::operator()(PosType G1, PosType G2)
 {
-  if (std::fabs(dot(G1,G1) - dot(G2,G2)) > 1.0e-8)
+  if (std::abs(dot(G1,G1) - dot(G2,G2)) > 1.0e-8)
     return dot(G1,G1) < dot(G2,G2);
   // if (Equivalent(G1,G2)) return false;
-  vector<ComplexType> rho_G1(NumIonSpecies), rho_G2(NumIonSpecies);
+  std::vector<ComplexType> rho_G1(NumIonSpecies), rho_G2(NumIonSpecies);
   StructureFactor(G1, rho_G1);
   StructureFactor(G2, rho_G2);
   for (int i=0; i<NumIonSpecies; i++ )
     for (int j=i+1; j<NumIonSpecies; j++)
     {
-      ComplexType zG1 = rho_G1[i]*conj(rho_G1[j]);
-      ComplexType zG2 = rho_G2[i]*conj(rho_G2[j]);
+      ComplexType zG1 = rho_G1[i]*qmcplusplus::conj(rho_G1[j]);
+      ComplexType zG2 = rho_G2[i]*qmcplusplus::conj(rho_G2[j]);
       double SG1  = std::real(zG1);
       double SG2  = std::real(zG2);
-      if (std::fabs(SG1 - SG2) > 1.0e-8)
+      if (std::abs(SG1 - SG2) > 1.0e-8)
         return SG1 < SG2;
     }
   return false;
@@ -157,19 +159,19 @@ bool
 kSpaceJastrow::Equivalent(PosType G1, PosType G2)
 {
   return (!(*this)(G1,G2) && !(*this)(G2,G1));
-  if (std::fabs(dot(G1,G1) - dot(G2,G2)) > 1.0e-8)
+  if (std::abs(dot(G1,G1) - dot(G2,G2)) > 1.0e-8)
     return false;
-  vector<ComplexType> rho_G1(NumIonSpecies), rho_G2(NumIonSpecies);
+  std::vector<ComplexType> rho_G1(NumIonSpecies), rho_G2(NumIonSpecies);
   StructureFactor(G1, rho_G1);
   StructureFactor(G2, rho_G2);
   for (int j=0; j<NumIonSpecies; j++)
     for (int i=j; i<NumIonSpecies; i++ )
     {
-      ComplexType zG1 = rho_G1[i]*conj(rho_G1[j]);
-      ComplexType zG2 = rho_G2[i]*conj(rho_G2[j]);
+      ComplexType zG1 = rho_G1[i]*qmcplusplus::conj(rho_G1[j]);
+      ComplexType zG2 = rho_G2[i]*qmcplusplus::conj(rho_G2[j]);
       double SG1  = std::real(zG1);
       double SG2  = std::real(zG2);
-      if (std::fabs(SG1 - SG2) > 1.0e-8)
+      if (std::abs(SG1 - SG2) > 1.0e-8)
         return false;
     }
   return true;
@@ -212,7 +214,7 @@ kSpaceJastrow::sortGvecs(std::vector<PosType> &gvecs,
       for (int i=1; i<gvecs.size(); i++)
       {
         double mag2 = dot(gvecs[i],gvecs[i]);
-        if (std::fabs(mag2-curMag2) < 1.0e-10)
+        if (std::abs(mag2-curMag2) < 1.0e-10)
           coef.lastIndex = i;
         else
         {
@@ -240,15 +242,15 @@ kSpaceJastrow::sortGvecs(std::vector<PosType> &gvecs,
   {
     app_log() << "  Group " << i << ":\n";
     for (int j=coefs[i].firstIndex; j<=coefs[i].lastIndex; j++)
-      app_log() << "    " << gvecs[j] << "    " << std::sqrt(dot(gvecs[j], gvecs[j])) << endl;
+      app_log() << "    " << gvecs[j] << "    " << std::sqrt(dot(gvecs[j], gvecs[j])) << std::endl;
   }
 }
 
 kSpaceJastrow::kSpaceJastrow(ParticleSet& ions, ParticleSet& elecs,
                              SymmetryType oneBodySymm, RealType oneBodyCutoff,
-                             string onebodyid, bool oneBodySpin,
+                             std::string onebodyid, bool oneBodySpin,
                              SymmetryType twoBodySymm, RealType twoBodyCutoff,
-                             string twobodyid, bool twoBodySpin)
+                             std::string twobodyid, bool twoBodySpin)
   : Ions(ions), Elecs(elecs),OneBodyID(onebodyid),TwoBodyID(twobodyid)
 {
   Optimizable=true;
@@ -256,14 +258,14 @@ kSpaceJastrow::kSpaceJastrow(ParticleSet& ions, ParticleSet& elecs,
   NumIonSpecies = 0;
   NumElecs = elecs.getLocalNum();
   for (int iat=0; iat<ions.getLocalNum(); iat++)
-    NumIonSpecies = max(NumIonSpecies, ions.GroupID[iat]+1);
+    NumIonSpecies = std::max(NumIonSpecies, ions.GroupID[iat]+1);
   if (oneBodyCutoff > 0.0)
   {
     setupGvecs(oneBodyCutoff, OneBodyGvecs, true);
     sortGvecs (OneBodyGvecs, OneBodySymmCoefs, oneBodySymm);
     for (int i=0; i<OneBodySymmCoefs.size(); i++)
     {
-      stringstream name_real, name_imag;
+      std::stringstream name_real, name_imag;
       name_real << OneBodyID << "_" << 2*i;
       name_imag << OneBodyID << "_" << 2*i+1;
       myVars.insert(name_real.str(),OneBodySymmCoefs[i].cG.real(),true,optimize::LOGLINEAR_P);
@@ -278,7 +280,7 @@ kSpaceJastrow::kSpaceJastrow(ParticleSet& ions, ParticleSet& elecs,
     sortGvecs (TwoBodyGvecs, TwoBodySymmCoefs, twoBodySymm);
     for (int i=0; i<TwoBodySymmCoefs.size(); i++)
     {
-      stringstream name;
+      std::stringstream name;
       name << TwoBodyID << "_" << i;
       myVars.insert(name.str(),TwoBodySymmCoefs[i].cG,true,optimize::LOGLINEAR_P);
       //VarMap[name.str()] = &(TwoBodySymmCoefs[i].cG);
@@ -324,13 +326,13 @@ kSpaceJastrow::setCoefficients(std::vector<RealType> &oneBodyCoefs,
 {
   int kk(0);
 //     for (int i=0; i<oneBodyCoefs.size(); i++)
-//       cerr << "oneBodyCoefs[" << i << "] = " << oneBodyCoefs[i] << endl;
+//       std::cerr << "oneBodyCoefs[" << i << "] = " << oneBodyCoefs[i] << std::endl;
   if (oneBodyCoefs.size() != 2*OneBodySymmCoefs.size())
   {
     app_warning() << "Warning!  Wrong number of coefficients specified in "
                   << "kSpaceJastrow's one-body coefficients.\n"
                   << oneBodyCoefs.size() << " were specified.  Should have been "
-                  << 2*OneBodySymmCoefs.size() << endl;
+                  << 2*OneBodySymmCoefs.size() << std::endl;
     for (int i=0; i<OneBodySymmCoefs.size(); i++)
     {
       OneBodySymmCoefs[i].cG = ComplexType();
@@ -354,7 +356,7 @@ kSpaceJastrow::setCoefficients(std::vector<RealType> &oneBodyCoefs,
     app_warning() << "Warning!  Wrong number of coefficients specified in "
                   << "kSpaceJastrow's two-body coefficients.\n"
                   << twoBodyCoefs.size() << " were specified.  Should have been "
-                  << TwoBodySymmCoefs.size() << endl;
+                  << TwoBodySymmCoefs.size() << std::endl;
     for (int i=0; i<TwoBodySymmCoefs.size(); i++)
     {
       TwoBodySymmCoefs[i].cG = 0.0;
@@ -410,7 +412,7 @@ kSpaceJastrow::evaluateLog(ParticleSet& P,
     eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
     for (int i=0; i<nOne; i++)
     {
-      ComplexType z = OneBodyCoefs[i] * conj(OneBody_e2iGr[i]);
+      ComplexType z = OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]);
       J1 += Prefactor*real(z);
       G[iat] += -Prefactor*real(z*eye)*OneBodyGvecs[i];
       L[iat] += -Prefactor*dot(OneBodyGvecs[i],OneBodyGvecs[i])*real(z);
@@ -429,10 +431,10 @@ kSpaceJastrow::evaluateLog(ParticleSet& P,
     for (int iG=0; iG<nTwo; iG++)
       TwoBody_rhoG[iG] += TwoBody_e2iGr_new[iG];
   }
-//     cerr << "TwoBody_rhoG = ";
+//     std::cerr << "TwoBody_rhoG = ";
 //     for (int i=0; i<nTwo; i++)
-//       cerr << TwoBody_rhoG[i]  << "  ";
-//     cerr << endl;
+//       std::cerr << TwoBody_rhoG[i]  << "  ";
+//     std::cerr << std::endl;
   for (int i=0; i<nTwo; i++)
     J2 += Prefactor*TwoBodyCoefs[i]*norm(TwoBody_rhoG[i]);
   for (int iat=0; iat<N; iat++)
@@ -445,8 +447,8 @@ kSpaceJastrow::evaluateLog(ParticleSet& P,
     {
       PosType Gvec(TwoBodyGvecs[i]);
       ComplexType z = TwoBody_e2iGr_new[i];
-      G[iat] += -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(conj(TwoBody_rhoG[i])*z);
-      L[iat] += Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(z*conj(TwoBody_rhoG[i])) + 1.0);
+      G[iat] += -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(qmcplusplus::conj(TwoBody_rhoG[i])*z);
+      L[iat] += Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(z*qmcplusplus::conj(TwoBody_rhoG[i])) + 1.0);
     }
   }
   return J1 + J2;
@@ -467,7 +469,7 @@ kSpaceJastrow::GradType kSpaceJastrow::evalGrad(ParticleSet& P, int iat)
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
   {
-    ComplexType z = OneBodyCoefs[i] * conj(OneBody_e2iGr[i]);
+    ComplexType z = OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]);
 //    J1 += Prefactor*real(z);
     G += -Prefactor*real(z*eye)*OneBodyGvecs[i];
 //    L[iat] += -Prefactor*dot(OneBodyGvecs[i],OneBodyGvecs[i])*real(z);
@@ -486,10 +488,10 @@ kSpaceJastrow::GradType kSpaceJastrow::evalGrad(ParticleSet& P, int iat)
     for (int iG=0; iG<nTwo; iG++)
       TwoBody_rhoG[iG] += TwoBody_e2iGr_new[iG];
   }
-//     cerr << "TwoBody_rhoG = ";
+//     std::cerr << "TwoBody_rhoG = ";
 //     for (int i=0; i<nTwo; i++)
-//       cerr << TwoBody_rhoG[i]  << "  ";
-//     cerr << endl;
+//       std::cerr << TwoBody_rhoG[i]  << "  ";
+//     std::cerr << std::endl;
 //     for (int i=0; i<nTwo; i++)
 //       J2 += Prefactor*TwoBodyCoefs[i]*norm(TwoBody_rhoG[i]);
 //     for (int iat=0; iat<N; iat++) {
@@ -501,8 +503,8 @@ kSpaceJastrow::GradType kSpaceJastrow::evalGrad(ParticleSet& P, int iat)
   {
     PosType Gvec(TwoBodyGvecs[i]);
     ComplexType z = TwoBody_e2iGr_new[i];
-    G += -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(conj(TwoBody_rhoG[i])*z);
-//    L[iat] += Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(z*conj(TwoBody_rhoG[i])) + 1.0);
+    G += -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(qmcplusplus::conj(TwoBody_rhoG[i])*z);
+//    L[iat] += Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(z*qmcplusplus::conj(TwoBody_rhoG[i])) + 1.0);
   }
 //     }
   return G;
@@ -521,7 +523,7 @@ kSpaceJastrow::ratioGrad(ParticleSet& P, int iat, GradType& grad_iat)
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
   {
-    ComplexType z = OneBodyCoefs[i] * conj(OneBody_e2iGr[i]);
+    ComplexType z = OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]);
     J1new += Prefactor*real(z);
     grad_iat += -Prefactor*real(z*eye)*OneBodyGvecs[i];
   }
@@ -529,7 +531,7 @@ kSpaceJastrow::ratioGrad(ParticleSet& P, int iat, GradType& grad_iat)
     OneBodyPhase[i] = dot(OneBodyGvecs[i], rold);
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
-    J1old += Prefactor*real(OneBodyCoefs[i] * conj(OneBody_e2iGr[i]));
+    J1old += Prefactor*real(OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]));
   // Now, do two-body part
   int nTwo = TwoBodyGvecs.size();
   for (int i=0; i<nTwo; i++)
@@ -552,7 +554,7 @@ kSpaceJastrow::ratioGrad(ParticleSet& P, int iat, GradType& grad_iat)
   {
     PosType Gvec(TwoBodyGvecs[i]);
     ComplexType z = TwoBody_e2iGr_new[i];
-    grad_iat += -Prefactor*2.0*TwoBodyGvecs[i]*TwoBodyCoefs[i]*imag(conj(TwoBody_rhoG[i])*TwoBody_e2iGr_new[i]);
+    grad_iat += -Prefactor*2.0*TwoBodyGvecs[i]*TwoBodyCoefs[i]*imag(qmcplusplus::conj(TwoBody_rhoG[i])*TwoBody_e2iGr_new[i]);
   }
   return std::exp(J1new+J2new - (J1old + J2old));
 }
@@ -571,12 +573,12 @@ kSpaceJastrow::ratio(ParticleSet& P, int iat)
     OneBodyPhase[i] = dot(OneBodyGvecs[i], rnew);
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
-    J1new += Prefactor*real(OneBodyCoefs[i] * conj(OneBody_e2iGr[i]));
+    J1new += Prefactor*real(OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]));
   for (int i=0; i<nOne; i++)
     OneBodyPhase[i] = dot(OneBodyGvecs[i], rold);
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
-    J1old += Prefactor*real(OneBodyCoefs[i] * conj(OneBody_e2iGr[i]));
+    J1old += Prefactor*real(OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]));
   // Now, do two-body part
   int nTwo = TwoBodyGvecs.size();
   for (int i=0; i<nTwo; i++)
@@ -600,7 +602,7 @@ kSpaceJastrow::ratio(ParticleSet& P, int iat)
 
 /** evaluate the ratio
 */
-inline void kSpaceJastrow::get_ratios(ParticleSet& P, vector<kSpaceJastrow::ValueType>& ratios)
+inline void kSpaceJastrow::get_ratios(ParticleSet& P, std::vector<kSpaceJastrow::ValueType>& ratios)
 {
   RealType J1new(0.0);
   PosType rnew(P.R[0]);
@@ -611,7 +613,7 @@ inline void kSpaceJastrow::get_ratios(ParticleSet& P, vector<kSpaceJastrow::Valu
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
 // //
   for (int i=0; i<nOne; i++)
-    J1new += Prefactor*real(OneBodyCoefs[i] * conj(OneBody_e2iGr[i]));
+    J1new += Prefactor*real(OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]));
   // Now, do two-body part
   int nTwo = TwoBodyGvecs.size();
   for (int i=0; i<nTwo; i++)
@@ -630,7 +632,7 @@ inline void kSpaceJastrow::get_ratios(ParticleSet& P, vector<kSpaceJastrow::Valu
       OneBodyPhase[i] = dot(OneBodyGvecs[i], rold);
     eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
     for (int i=0; i<nOne; i++)
-      J1old += Prefactor*real(OneBodyCoefs[i] * conj(OneBody_e2iGr[i]));
+      J1old += Prefactor*real(OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]));
     for (int i=0; i<nTwo; i++)
       TwoBodyPhase[i] = dot(TwoBodyGvecs[i], rold);
     eval_e2iphi (TwoBodyPhase, TwoBody_e2iGr_old);
@@ -660,7 +662,7 @@ kSpaceJastrow::logRatio(ParticleSet& P, int iat,
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
   {
-    ComplexType z = OneBodyCoefs[i] * conj(OneBody_e2iGr[i]);
+    ComplexType z = OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]);
     J1 += Prefactor*real(z);
     dG[iat] += -Prefactor*real(z*eye) * OneBodyGvecs[i];
     dL[iat] += -Prefactor*dot(OneBodyGvecs[i],OneBodyGvecs[i])*real(z);
@@ -670,7 +672,7 @@ kSpaceJastrow::logRatio(ParticleSet& P, int iat,
   eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
   for (int i=0; i<nOne; i++)
   {
-    ComplexType z = OneBodyCoefs[i] * conj(OneBody_e2iGr[i]);
+    ComplexType z = OneBodyCoefs[i] * qmcplusplus::conj(OneBody_e2iGr[i]);
     J1 -= Prefactor*real(z);
     dG[iat] -= -Prefactor*real(z*eye) * OneBodyGvecs[i];
     dL[iat] -= -Prefactor*dot(OneBodyGvecs[i],OneBodyGvecs[i])*real(z);
@@ -713,10 +715,10 @@ kSpaceJastrow::logRatio(ParticleSet& P, int iat,
       //ComplexType zold, znew;
       //sincos (dot(Gvec,rj_old), &(zold.imag()), &(zold.real()));
       //sincos (dot(Gvec,rj_new), &(znew.imag()), &(znew.real()));
-      //dG[jat] += -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(conj(rhoG_new)*znew);
-      //dG[jat] -= -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(conj(rhoG_old)*zold);
-      //dL[jat] += Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(znew*conj(rhoG_new)) + 1.0);
-      //dL[jat] -= Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(zold*conj(rhoG_old)) + 1.0);
+      //dG[jat] += -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(qmcplusplus::conj(rhoG_new)*znew);
+      //dG[jat] -= -Prefactor*2.0*Gvec*TwoBodyCoefs[i]*imag(qmcplusplus::conj(rhoG_old)*zold);
+      //dL[jat] += Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(znew*qmcplusplus::conj(rhoG_new)) + 1.0);
+      //dL[jat] -= Prefactor*2.0*TwoBodyCoefs[i]*dot(Gvec,Gvec)*(-real(zold*qmcplusplus::conj(rhoG_old)) + 1.0);
     }
   }
   return J1 + J2;
@@ -735,7 +737,7 @@ kSpaceJastrow::acceptMove(ParticleSet& P, int iat)
   for (int i=0; i<TwoBody_e2iGr_new.size(); i++)
     TwoBody_rhoG[i] += Delta_e2iGr(iat,i);
   //TwoBody_e2iGr_new[i] - TwoBody_e2iGr_old[i];
-  // std::copy(eikr_new.data(),eikr_new.data()+MaxK,eikr[iat]);
+  // copy(eikr_new.data(),eikr_new.data()+MaxK,eikr[iat]);
   // U += offU;
   // dU += offdU;
   // d2U += offd2U;
@@ -747,7 +749,7 @@ kSpaceJastrow::update(ParticleSet& P,
                       ParticleSet::ParticleLaplacian_t& dL,
                       int iat)
 {
-  app_error() << "kSpaceJastrow::update is INCOMPLETE " << endl;
+  app_error() << "kSpaceJastrow::update is INCOMPLETE " << std::endl;
   abort();
 }
 
@@ -760,7 +762,7 @@ kSpaceJastrow::registerData(ParticleSet& P, PooledData<RealType>& buf)
   // eikr_new.resize(MaxK);
   // delta_eikr.resize(MaxK);
   // for(int iat=0; iat<NumPtcls; iat++)
-  //   std::copy(P.SK->eikr[iat],P.SK->eikr[iat]+MaxK,eikr[iat]);
+  //   copy(P.SK->eikr[iat],P.SK->eikr[iat]+MaxK,eikr[iat]);
   // buf.add(Rhok.first_address(), Rhok.last_address());
   // buf.add(U.first_address(), U.last_address());
   // buf.add(d2U.first_address(), d2U.last_address());
@@ -775,7 +777,7 @@ kSpaceJastrow::updateBuffer(ParticleSet& P, PooledData<RealType>& buf,
 {
   LogValue=evaluateLog(P,P.G,P.L);
   // for(int iat=0; iat<NumPtcls; iat++)
-  //   std::copy(P.SK->eikr[iat],P.SK->eikr[iat]+MaxK,eikr[iat]);
+  //   copy(P.SK->eikr[iat],P.SK->eikr[iat]+MaxK,eikr[iat]);
   // buf.put(Rhok.first_address(), Rhok.last_address());
   // buf.put(U.first_address(), U.last_address());
   // buf.put(d2U.first_address(), d2U.last_address());
@@ -813,7 +815,7 @@ kSpaceJastrow::evaluateLog(ParticleSet& P, PooledData<RealType>& buf)
     eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
     for (int i=0; i<nOne; i++)
     {
-      J1 +=  Prefactor*real(OneBodyCoefs[i]  * conj(OneBody_e2iGr[i]));
+      J1 +=  Prefactor*real(OneBodyCoefs[i]  * qmcplusplus::conj(OneBody_e2iGr[i]));
     }
   }
   // Do two-body part
@@ -868,7 +870,7 @@ void kSpaceJastrow::checkOutVariables(const opt_variables_type& active)
   //Optimizable=myVars.is_optimizable();
 }
 
-void kSpaceJastrow::reportStatus(ostream& os)
+void kSpaceJastrow::reportStatus(std::ostream& os)
 {
 }
 
@@ -886,7 +888,9 @@ kSpaceJastrow::resetParameters(const opt_variables_type& active)
     if(loc_r>=0)
     {
       myVars[ii]=active[loc_r];    //update the optimization parameter
-      OneBodySymmCoefs[i].cG.real()=myVars[ii];  //update the coefficient from local opt parametr
+      //lvalue error with LLVM
+      OneBodySymmCoefs[i].cG=ComplexType(myVars[ii],OneBodySymmCoefs[i].cG.imag());  
+      //OneBodySymmCoefs[i].cG.real()=myVars[ii];  //update the coefficient from local opt parametr
       ii++;  
     }
     //The imaginary part...
@@ -894,7 +898,9 @@ kSpaceJastrow::resetParameters(const opt_variables_type& active)
     if(loc_i>=0)
     {
       myVars[ii]=active[loc_i];
-      OneBodySymmCoefs[i].cG.imag()=myVars[ii];
+      //lvalue error with LLVM 
+      OneBodySymmCoefs[i].cG=ComplexType(OneBodySymmCoefs[i].cG.real(),myVars[ii]);  
+      //OneBodySymmCoefs[i].cG.imag()=myVars[ii];
       ii++;
     }
   }
@@ -931,14 +937,14 @@ OrbitalBasePtr kSpaceJastrow::makeClone(ParticleSet& tqp) const
   // kSpaceJastrow *kj = new kSpaceJastrow(*this);
   // kj->VarMap.clear();
   // for (int i=0; i<OneBodySymmCoefs.size(); i++) {
-  //   stringstream name_real, name_imag;
+  //   std::stringstream name_real, name_imag;
   //   name_real << OneBodyID << "_" << 2*i;
   //   name_imag << OneBodyID << "_" << 2*i+1;
   //   kj->VarMap[name_real.str()] = &(kj->OneBodySymmCoefs[i].cG.real());
   //   kj->VarMap[name_imag.str()] = &(kj->OneBodySymmCoefs[i].cG.imag());
   // }
   // for (int i=0; i<TwoBodySymmCoefs.size(); i++) {
-  //   stringstream name;
+  //   std::stringstream name;
   //   name << TwoBodyID << "_" << i;
   //   kj->VarMap[name.str()] = &(kj->TwoBodySymmCoefs[i].cG);
   // }
@@ -986,14 +992,14 @@ void kSpaceJastrow::copyFrom(const kSpaceJastrow& old)
   OneBodyVarMap=old.OneBodyVarMap;
   Prefactor=old.Prefactor;
   //for (int i=0; i<OneBodySymmCoefs.size(); i++) {
-  //  stringstream name_real, name_imag;
+  //  std::stringstream name_real, name_imag;
   //  name_real << OneBodyID << "_" << 2*i;
   //  name_imag << OneBodyID << "_" << 2*i+1;
   //  VarMap[name_real.str()] = &(OneBodySymmCoefs[i].cG.real());
   //  VarMap[name_imag.str()] = &(OneBodySymmCoefs[i].cG.imag());
   //}
   //for (int i=0; i<TwoBodySymmCoefs.size(); i++) {
-  //  stringstream name;
+  //  std::stringstream name;
   //  name << TwoBodyID << "_" << i;
   //  VarMap[name.str()] = &(TwoBodySymmCoefs[i].cG);
   //}
@@ -1001,8 +1007,8 @@ void kSpaceJastrow::copyFrom(const kSpaceJastrow& old)
 
 void kSpaceJastrow::evaluateDerivatives(ParticleSet& P,
                                         const opt_variables_type& active,
-                                        vector<RealType>& dlogpsi,
-                                        vector<RealType>& dhpsioverpsi)
+                                        std::vector<RealType>& dlogpsi,
+                                        std::vector<RealType>& dhpsioverpsi)
 {
   bool recalculate(false);
   for (int k=0; k<myVars.size(); ++k)
@@ -1029,13 +1035,14 @@ void kSpaceJastrow::evaluateDerivatives(ParticleSet& P,
         eval_e2iphi (OneBodyPhase, OneBody_e2iGr);
         for (int i=0; i<nOne; i++)
         {
-          ComplexType z =  conj(OneBody_e2iGr[i]);
+          ComplexType z =  qmcplusplus::conj(OneBody_e2iGr[i]);
           int kk=myVars.where(OneBodyVarMap[i]);
           if (kk>=0)
           {
             //real part of coeff
             dlogpsi[kk] += Prefactor*real(z);
-            convert(dot(OneBodyGvecs[i],P.G[iat]),tmp_dot);
+            //convert(dot(OneBodyGvecs[i],P.G[iat]),tmp_dot);
+            convert(dot(P.G[iat],OneBodyGvecs[i]),tmp_dot);
             dhpsioverpsi[kk] +=  0.5*Prefactor*dot(OneBodyGvecs[i],OneBodyGvecs[i])*real(z) + Prefactor*real(z*eye)*tmp_dot;
             //	+ Prefactor*real(z*eye)*real(dot(OneBodyGvecs[i],P.G[iat]));
             //imaginary part of coeff,
@@ -1082,8 +1089,8 @@ void kSpaceJastrow::evaluateDerivatives(ParticleSet& P,
         if (kk>0)
         {
           convert(dot(P.G[iat],Gvec),tmp_dot);
-          //dhpsioverpsi[kk] -= Prefactor*dot(Gvec,Gvec)*(-real(z*conj(TwoBody_rhoG[i])) + 1.0) - Prefactor*2.0*real(dot(P.G[iat],Gvec))*imag(conj(TwoBody_rhoG[i])*z);
-          dhpsioverpsi[kk] -= Prefactor*dot(Gvec,Gvec)*(-real(z*conj(TwoBody_rhoG[i])) + 1.0) - Prefactor*2.0*tmp_dot*imag(conj(TwoBody_rhoG[i])*z);
+          //dhpsioverpsi[kk] -= Prefactor*dot(Gvec,Gvec)*(-real(z*qmcplusplus::conj(TwoBody_rhoG[i])) + 1.0) - Prefactor*2.0*real(dot(P.G[iat],Gvec))*imag(qmcplusplus::conj(TwoBody_rhoG[i])*z);
+          dhpsioverpsi[kk] -= Prefactor*dot(Gvec,Gvec)*(-real(z*qmcplusplus::conj(TwoBody_rhoG[i])) + 1.0) - Prefactor*2.0*tmp_dot*imag(qmcplusplus::conj(TwoBody_rhoG[i])*z);
         }
       }
     }

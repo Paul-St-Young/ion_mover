@@ -1,18 +1,18 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2003-  by Jeongnim Kim
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: jnkim@ncsa.uiuc.edu
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
 /** @file kSpaceJastrow.h
  * @brief Declaration of Long-range TwoBody Jastrow
  *
@@ -145,9 +145,9 @@ private:
 public:
   kSpaceJastrow(ParticleSet& ions, ParticleSet& elecs,
                 SymmetryType oneBodySymm, RealType oneBodyCutoff,
-                string onebodyid, bool oneBodySpin,
+                std::string onebodyid, bool oneBodySpin,
                 SymmetryType twoBodySymm, RealType twoBodyCutoff,
-                string twobodyid, bool twoBodySpin);
+                std::string twobodyid, bool twoBodySpin);
 
 
   void setCoefficients (std::vector<RealType> &oneBodyCoefs,
@@ -157,7 +157,7 @@ public:
   void checkInVariables(opt_variables_type& active);
   void checkOutVariables(const opt_variables_type& active);
   void resetParameters(const opt_variables_type& active);
-  void reportStatus(ostream& os);
+  void reportStatus(std::ostream& os);
   //evaluate the distance table with els
   void resetTargetParticleSet(ParticleSet& P);
 
@@ -216,23 +216,18 @@ public:
 
   void evaluateDerivatives(ParticleSet& P,
                            const opt_variables_type& active,
-                           vector<RealType>& dlogpsi,
-                           vector<RealType>& dhpsioverpsi);
+                           std::vector<RealType>& dlogpsi,
+                           std::vector<RealType>& dhpsioverpsi);
 
   /** evaluate the ratio
   */
-  inline void get_ratios(ParticleSet& P, vector<ValueType>& ratios);
+  inline void get_ratios(ParticleSet& P, std::vector<ValueType>& ratios);
 
 private:
   void copyFrom(const kSpaceJastrow& old);
   kSpaceJastrow(const ParticleSet& ions, ParticleSet& els);
-  vector<int> TwoBodyVarMap;
-  vector<int> OneBodyVarMap;
+  std::vector<int> TwoBodyVarMap;
+  std::vector<int> OneBodyVarMap;
 };
 }
 #endif
-/***************************************************************************
- * $RCSfile$   $Author: jnkim $
- * $Revision: 2595 $   $Date: 2008-04-17 07:52:58 -0500 (Thu, 17 Apr 2008) $
- * $Id: kSpaceJastrow.h 2595 2008-04-17 12:52:58Z jnkim $
- ***************************************************************************/

@@ -371,16 +371,8 @@ struct PooledData
   inline void add(std::complex<T>* first,std::complex<T>* last)
   {
     size_type dn=2*(last-first);
-    //TEMPORARY FIX FOR SGI-IA64
-#if defined(SGI_IA64)  || defined(PROFILING_ON)
-    for(; first != last; ++first)
-    {
-      myData.push_back((*first).real());
-      myData.push_back((*first).imag());
-    }
-#else
-    myData.insert(myData.end(),&(first->real()),&(first->real())+dn);
-#endif
+    T* t=reinterpret_cast<T*>(first);
+    myData.insert(myData.end(),t,t+dn);
     Current += dn;
   }
 

@@ -248,9 +248,9 @@ struct SplineAdoptorReaderInterface: public BsplineReaderBase
       {
 	  int ti=cur_bands[iorb].TwistIndex;
 	//get_psi_g(ti,spin,cur_bands[iorb].BandIndex,cG);//bcast cG  //Ray:  HWIi
-	  cout<<"quick try rank="<<myComm->rank()<<endl;
-          cout<<"esinterfacebase->getNumBands()="<<esinterface->getNumBands()<<endl;
-	  cout<<"esinterface,cgsize,spin,bandindex,ti="<<esinterface<<","<<cG.size()<<","<<spin<<","<<cur_bands[iorb].BandIndex<<","<<ti<<" myrank="<<myComm->rank()<<endl;
+	  //cout<<"quick try rank="<<myComm->rank()<<endl;
+          //cout<<"esinterfacebase->getNumBands()="<<esinterface->getNumBands()<<endl;
+	  //cout<<"esinterface,cgsize,spin,bandindex,ti="<<esinterface<<","<<cG.size()<<","<<spin<<","<<cur_bands[iorb].BandIndex<<","<<ti<<" myrank="<<myComm->rank()<<endl;
           esinterface->getPsi_kspace(cG, spin, cur_bands[iorb].BandIndex, ti);
 	  
           int ngvec=mybuilder->Gvecs[0].size();

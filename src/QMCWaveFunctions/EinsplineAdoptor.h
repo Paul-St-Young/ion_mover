@@ -264,6 +264,18 @@ struct BsplineSet: public SPOSetBase, public SplineAdoptor
       SplineAdoptor::evaluate_vgh(P.R[iat],v,g,h);
     }
   }
+  virtual void evaluate_notranspose(const ParticleSet& P, int first, int last,
+                            ValueMatrix_t& psi, 
+                            GradMatrix_t& dpsi,
+                            HessMatrix_t& grad_grad_psi,
+                            GGGMatrix_t& grad_grad_grad_logdet)
+  {
+    typedef ValueMatrix_t::value_type value_type;
+    typedef GradMatrix_t::value_type grad_type;
+    typedef HessMatrix_t::value_type hess_type;
+    typedef GGGMatrix_t::value_type ggg_type;
+
+  }
 
 };
 

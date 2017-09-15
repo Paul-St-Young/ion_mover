@@ -1,19 +1,18 @@
-//////////////////////////////////////////////////////////////////
-// (c) Copyright 2008-  by Ken Esler
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//   National Center for Supercomputing Applications &
-//   Materials Computation Center
-//   University of Illinois, Urbana-Champaign
-//   Urbana, IL 61801
-//   e-mail: kesler@ciw.edu
-//   Tel:
+//////////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the University of Illinois/NCSA Open Source License.
+// See LICENSE file in top directory for details.
 //
-// Supported by
-//   National Center for Supercomputing Applications, UIUC
-//   Materials Computation Center, UIUC
-//////////////////////////////////////////////////////////////////
-// -*- C++ -*-
+// Copyright (c) 2016 Jeongnim Kim and QMCPACK developers.
+//
+// File developed by: Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeongnim Kim, jeongnim.kim@gmail.com, University of Illinois at Urbana-Champaign
+//                    Jeremy McMinnis, jmcminis@gmail.com, University of Illinois at Urbana-Champaign
+//                    Mark A. Berrill, berrillma@ornl.gov, Oak Ridge National Laboratory
+//
+// File created by: Ken Esler, kpesler@gmail.com, University of Illinois at Urbana-Champaign
+//////////////////////////////////////////////////////////////////////////////////////
+    
+    
 
 #include "QMCWaveFunctions/Jastrow/kSpaceJastrowBuilder.h"
 #include "OhmmsData/AttributeSet.h"
@@ -32,7 +31,7 @@ putContent2(std::vector<T>& a, xmlNodePtr cur)
   while(!stream.eof())
   {
     stream >> temp;
-    if (stream.fail() || stream.bad())
+    if ( stream.fail() || stream.bad())
       break;
     else
       a.push_back(temp);
@@ -47,7 +46,7 @@ kSpaceJastrowBuilder::put(xmlNodePtr cur)
   xmlNodePtr kids = cur->xmlChildrenNode;
   kSpaceJastrow::SymmetryType oneBodySymm, twoBodySymm;
   RealType kc1, kc2;
-  string symm1_opt, symm2_opt, id1_opt, id2_opt, spin1_opt("no"), spin2_opt("no");
+  std::string symm1_opt, symm2_opt, id1_opt, id2_opt, spin1_opt("no"), spin2_opt("no");
   std::vector<RealType> oneBodyCoefs, twoBodyCoefs;
   // Initialize options
   kc1 = kc2 = 0.0;
@@ -58,10 +57,10 @@ kSpaceJastrowBuilder::put(xmlNodePtr cur)
   {
     std::string kidsname = (char*)kids->name;
     std::vector<RealType> *coefs(NULL);
-    string* id_opt(NULL);
+    std::string* id_opt(NULL);
     if (kidsname == "correlation")
     {
-      string type_opt;
+      std::string type_opt;
       OhmmsAttributeSet attrib;
       attrib.add (type_opt, "type");
       attrib.put(kids);
@@ -92,10 +91,10 @@ kSpaceJastrowBuilder::put(xmlNodePtr cur)
         xmlNodePtr xmlCoefs = kids->xmlChildrenNode;
         while (xmlCoefs != NULL)
         {
-          string cname((const char*)xmlCoefs->name);
+          std::string cname((const char*)xmlCoefs->name);
           if (cname == "coefficients")
           {
-            string type("0"), id("0");
+            std::string type("0"), id("0");
             OhmmsAttributeSet cAttrib;
             cAttrib.add(*id_opt, "id");
             cAttrib.add(type, "type");
@@ -109,7 +108,7 @@ kSpaceJastrowBuilder::put(xmlNodePtr cur)
             //vector<T> can be read by this
             putContent2(*coefs,xmlCoefs);
             app_log() << "  Read " << coefs->size() << " coefficients for type "
-                      << type_opt << endl;
+                      << type_opt << std::endl;
           }
           xmlCoefs = xmlCoefs->next;
         }
@@ -124,11 +123,11 @@ kSpaceJastrowBuilder::put(xmlNodePtr cur)
     kids = kids->next;
   }
   // Now build the kSpaceJastrow
-  std::map<string,kSpaceJastrow::SymmetryType>::iterator symm1 =
+  std::map<std::string,kSpaceJastrow::SymmetryType>::iterator symm1 =
     SymmMap.find(symm1_opt);
   if (symm1 != SymmMap.end())
     oneBodySymm = symm1->second;
-  std::map<string,kSpaceJastrow::SymmetryType>::iterator symm2 =
+  std::map<std::string,kSpaceJastrow::SymmetryType>::iterator symm2 =
     SymmMap.find(symm2_opt);
   if (symm2 != SymmMap.end())
     twoBodySymm = symm2->second;

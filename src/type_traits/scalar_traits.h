@@ -155,10 +155,6 @@ inline T conj(const T& c)
 }
 
 
-using std::real;
-using std::imag;
-using std::conj;
-
 ///real part of product of scalars
 template<typename T>
 inline T prod_real(const T& a, const T& b)
